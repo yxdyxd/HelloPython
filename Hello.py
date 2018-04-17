@@ -100,3 +100,12 @@
 # print(add_end())
 # print(add_end())
 
+# 可变参数
+def calc(numbers):
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+
+
+print(calc([1, 2, 3]))

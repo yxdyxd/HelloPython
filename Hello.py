@@ -108,4 +108,63 @@ def calc(numbers):
     return sum
 
 
-print(calc([1, 2, 3]))
+# print(calc([1, 2, 3]))
+# print(calc([1, 3, 5, 7]))
+
+# print(calc([]))
+# 此处传入的参数应为空list或tuple，传入为空会报错
+# print(calc())
+
+# 1.重写此方法，在number前加上*号，将接受的参数变为可变参数
+# 2.加上*号，接收到的number依然是list或者tuple，函数代码完全不变
+def calc(*numbers):
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+
+
+# print(calc(1, 2, 3))
+# print(calc())
+
+# 假如传入的为list或者tuple，加上*即可
+# *nums表示把nums这个list的所有元素作为可变参数传进去
+nums = [1, 2, 3]
+
+
+# print(calc(*nums))
+
+
+def person(name, age, **kw):
+    print('name: %s' % name, 'age: %d' % age, \
+          'other: %s' % kw)
+
+
+# person('jack', 30)
+# person('tom', 28, city='Beijing')
+# person('bob', 12, gender='boy', city='Tianjin')
+
+extra = {'city': 'Beijing', 'job': 'Engineer'}
+# 注意kw获得的dict是extra的一份拷贝，对kw的改动\
+# 不会影响到函数外的extra
+# person('mike', 23, **extra)
+
+
+# 关键字参数
+# def person(name, age, **kw):
+#     if 'city' in kw:
+#         # 有city参数
+#         pass
+#     if 'job' in kw:
+#         # 有job参数
+#         pass
+#     print('name:%s' % name, 'age:%d' % age, 'other:', kw)
+
+# person('jack', 21, city='Beijing', addr='Chaoyang',\
+#        zipcode=12345)
+
+def person(name, age, *, city, job):
+    print(name, age, city, job)
+
+
+

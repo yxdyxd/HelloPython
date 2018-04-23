@@ -262,40 +262,276 @@
 #
 
 
-def fact(n):
-    if n == 1:
-        return 1
-    return n * fact(n - 1)
+# def fact(n):
+#     if n == 1:
+#         return 1
+#     return n * fact(n - 1)
+#
+#
+# # print(fact(1))
+# # print(fact(5))
+# # print(fact(1000))
+#
+# # 上边的方式会造成栈的溢出
+# # 解决方法是通过尾递归优化，在函数返回是，调用本身，并且不包含表达式
+#
+# def fact(n):
+#     return fact_iter(n, 1)
+#
+#
+# def fact_iter(num, product):
+#     if num == 1:
+#         return product
+#     return fact_iter(num - 1, num * product)
+#
+#
+# print(fact_iter(10, 1))
+#
+#
+# def move(n, a, b, c):
+#     if n == 1:
+#         print(a, '-->', c)
+#     else:
+#         move(n - 1, a, c, b)
+#         move(1, a, b, c)
+#         move(n - 1, b, a, c)
+#
+#
+# # 递归赋值（话说网上真的是能人辈出）
+# # print(move(3, 'A', 'B', 'C'))
+#
+#
+# # 切片
+# L = ['mike', 'bob', 'jack', 'lucy', 'tom']
+# # 取出前三个元素
+# print(L[0:3])
+# # 如果包含第一个元素的话，可以将0省略
+# print(L[:3])
+# # 取出第二三个元素
+# print(L[1:3])
+# # 也可倒数切片，例如-1
+# print(L[-2:])
+# print(L[-2:-1])
+#
+# # 取数练习
+# b = list(range(100))
+# print(b[:10])
+# print(b[-10:])
+# print(b[10:20])
+# # 前十个数，每隔两个取一个
+# print(b[:10:2])
+# # 所有数，每5个取一个
+# print(b[::5])
+# # 取出所有数
+# # print(b[:])
+# # 字符串也可用来切片
+# # 但是针对字符串的截取，有各种的系统方法(例如，substring)
+#
+#
+# str = '  hello  '
+# print(str[:1])
+#
+#
+# def trim(s):
+#     if s[:1] == " ":
+#         return trim(s[1:])
+#     if s[-1:] == " ":
+#         return trim(s[:-1])
+#     return s
+#
+#
+# if trim('hello  ') != 'hello':
+#     print('测试失败!')
+# elif trim('  hello') != 'hello':
+#     print('测试失败!')
+# elif trim('  hello  ') != 'hello':
+#     print('测试失败!')
+# elif trim('  hello  world  ') != 'hello  world':
+#     print('测试失败!')
+# elif trim('') != '':
+#     print('测试失败!')
+# elif trim('    ') != '':
+#     print('测试失败!')
+# else:
+#     print('测试成功!')
 
 
-# print(fact(1))
-# print(fact(5))
-# print(fact(1000))
+# d = {'a': 1, 'b': 2, 'c': 3}
+# # Python中的遍历循环，称之为迭代
+# # 迭代dict中的key
+# for key in d:
+#     print(key)
+#
+# # 迭代dict中的Value
+# for value in d.values():
+#     print(value)
+#
+# # 迭代dict中的Value和key
+# for k, v in d.items():
+#     print(k, v)
+#
+# # 字符串也可以迭代
+# for ch in 'ABC':
+#     print(ch)
+#
+# # 判断一个对象是否可迭代
+# from collections import Iterable
+# print(isinstance('abc', Iterable))
+# print(isinstance([1, 2, 3], Iterable))
+# # 整数不能迭代
+# print(isinstance(123, Iterable))
+#
+# # Python内置的enumerate函数可以把一个list变成索引-元素对
+# for i, value in enumerate(['A', 'B', 'c']):
+#     print(i, value)
+#
+# for x, y in ([1, 1], [2, 4], [3, 9]):
+#     print(x, y)
+#
+#
+# # 请使用迭代查找一个list中最小和最大值，并返回一个tuple
+# def findMinAndMax(L):
+#     if L == []:
+#         return (None, None)
+#     else:
+#         MIN = L[0]
+#         MAX = L[0]
+#         for X in L:
+#             if MIN >= X:
+#                 MIN = X
+#             elif MAX <= X:
+#                 MAX = X
+#         return (MIN, MAX)
+#
+#
+# if findMinAndMax([]) != (None, None):
+#     print('测试失败!')
+# elif findMinAndMax([7]) != (7, 7):
+#     print('测试失败!')
+# elif findMinAndMax([7, 1]) != (1, 7):
+#     print('测试失败!')
+# elif findMinAndMax([7, 1, 3, 9, 5]) != (1, 9):
+#     print('测试失败!')
+# else:
+#     print('测试成功!')
 
-# 上边的方式会造成栈的溢出
-# 解决方法是通过尾递归优化，在函数返回是，调用本身，并且不包含表达式
 
-def fact(n):
-    return fact_iter(n, 1)
+# print(list(range(1, 11)))
+# # 列表生成式，快速生成list
+#
+# L = []
+# for x in range(1, 11):
+#     L.append(x * x)
+# print(L)
+#
+# #在列表生成式中，可以使用运算式，来得到自己想要的list
+# print([x*x for x in range(1, 11)])
+#
+# # or循环后面还可以加上if判断，这样我们就可以筛选出仅偶数的平方
+# print([x*x for x in range(1, 11) if x % 2 ==0])
+#
+# # 还可以使用两层循环，可以生成全排列
+# print([m + n for m in 'ABC' for n in 'XYZ'])
+#
+# # 导入os模块
+# import os
+# # os.listdir可以列出文件和目录
+# print([d for d in os.listdir('.')])
+#
+# # for循环其实可以同时使用两个甚至多个变量
+# # 比如dict的items()可以同时迭代key和value
+# d = {'x': 'A', 'y': 'B', 'z': 'C'}
+# for k, v in d.items():
+#     print(k, '=', v)
+#
+# # 列表生成式也可以使用两个变量来生成list
+# print([k + '=' + v for k, v in d.items()])
+#
+# # 把一个list中所有的字符串变成小写
+# L = ['Hello', 'World', 'IBM', 'Apple']
+# print([s.lower() for s in L])
+# # 把一个list中所有的字符串变成大写
+# print([s.upper() for s in L])
+#
+# # 使用内建的isinstance函数可以判断一个变量是不是字符串
+# x = 'abc'
+# y = 123
+# z = ''
+# print(isinstance(x, str))
+# # 也可用来判断是否是数字
+# print(isinstance(y, int))
+# # 判断是否为空
+# print(isinstance(z, str))
+#
+# # 修改列表生成式，通过添加if语句保证列表生成式能正确地执行
+# L1 = ['Hello', 'World', 18, 'Apple', None]
+#
+# L2 = [s.lower() for s in L1 if isinstance(s, str)]
+#
+# # 测试:
+# print(L2)
+# if L2 == ['hello', 'world', 'apple']:
+#     print('测试通过!')
+# else:
+#     print('测试失败!')
 
 
-def fact_iter(num, product):
-    if num == 1:
-        return product
-    return fact_iter(num - 1, num * product)
+L = [x*x for x in range(10)]
+# print(L)
+g = (x*x for x in range(10))
+# 在Python中，这种一边循环一边计算的机制，称为生成器：generator
+# 创建L和g的区别仅在于最外层的[]和()
+# L是一个list，而g是一个generator
+# generator并没有创建一个完整的数组，而是在不断的调用中生成
+# 主要的目的在于节省空间
+# print(g)
+
+#打印g中的所有元素
+# for n in g:
+#     print(n)
+
+# generator非常强大。如果推算的算法比较复杂
+# 用类似列表生成式的for循环无法实现的时候，还可以用函数来实现
+def fib(max):
+    n, a, b = 0, 0, 1
+    while n < max:
+        print(b)
+        a, b = b, a + b
+        n = n + 1
+    return 'done'
+
+# fib(6)
+
+# 修改上边函数为generator
+# 要把fib函数变成generator，只需要把print(b)改为yield b就可以了
+def fib(max):
+    n, a, b = 0, 0, 1
+    while n < max:
+        yield b
+        a, b = b, a + b
+        n = n + 1
+    return 'done'
 
 
-print(fact_iter(10, 1))
+f = fib(6)
+print(f)
+# 这是定义generator的另一种方法。如果一个函数定义中包含yield关键字
+# 那么这个函数就不再是一个普通函数，而是一个generator
+# for n in fib(6):
+#     print(n)
+
+# 捕获错误的发生
+g = fib(6)
+while True:
+    try:
+        x = next(g)
+        print('g:', x)
+    except StopIteration as e:
+        print('Generator return value:', e.value)
+        break
 
 
-def move(n, a, b, c):
-    if n == 1:
-        print(a, '-->', c)
-    else:
-        move(n-1, a, c, b)
-        move(1, a, b, c)
-        move(n-1, b, a, c)
+def triangles():
+    a, b = 1, 1
+    while True:
 
-
-# 递归赋值（话说网上真的是能人辈出）
-print(move(3, 'A', 'B', 'C'))

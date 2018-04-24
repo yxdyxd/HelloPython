@@ -476,62 +476,114 @@
 #     print('测试失败!')
 
 
-L = [x*x for x in range(10)]
-# print(L)
-g = (x*x for x in range(10))
-# 在Python中，这种一边循环一边计算的机制，称为生成器：generator
-# 创建L和g的区别仅在于最外层的[]和()
-# L是一个list，而g是一个generator
-# generator并没有创建一个完整的数组，而是在不断的调用中生成
-# 主要的目的在于节省空间
-# print(g)
+# L = [x*x for x in range(10)]
+# # print(L)
+# g = (x*x for x in range(10))
+# # 在Python中，这种一边循环一边计算的机制，称为生成器：generator
+# # 创建L和g的区别仅在于最外层的[]和()
+# # L是一个list，而g是一个generator
+# # generator并没有创建一个完整的数组，而是在不断的调用中生成
+# # 主要的目的在于节省空间
+# # print(g)
+#
+# #打印g中的所有元素
+# # for n in g:
+# #     print(n)
+#
+# # generator非常强大。如果推算的算法比较复杂
+# # 用类似列表生成式的for循环无法实现的时候，还可以用函数来实现
+# def fib(max):
+#     n, a, b = 0, 0, 1
+#     while n < max:
+#         print(b)
+#         a, b = b, a + b
+#         n = n + 1
+#     return 'done'
+#
+# # fib(6)
+#
+# # 修改上边函数为generator
+# # 要把fib函数变成generator，只需要把print(b)改为yield b就可以了
+# def fib(max):
+#     n, a, b = 0, 0, 1
+#     while n < max:
+#         yield b
+#         a, b = b, a + b
+#         n = n + 1
+#     return 'done'
+#
+#
+# f = fib(6)
+# print(f)
+# # 这是定义generator的另一种方法。如果一个函数定义中包含yield关键字
+# # 那么这个函数就不再是一个普通函数，而是一个generator
+# # for n in fib(6):
+# #     print(n)
+#
+# # 捕获错误的发生
+# # g = fib(6)
+# # while True:
+# #     try:
+# #         x = next(g)
+# #         print('g:', x)
+# #     except StopIteration as e:
+# #         print('Generator return value:', e.value)
+# #         break
+#
+#
+# def triangles():
+#     tr = [1]
+#     while True:
+#         yield tr
+#         ntr = tr[:]
+#         for i in range(len(tr)):
+#             if i == 0:
+#                 ntr[i] = 1
+#             else:
+#                 ntr[i] = tr[i] + tr[i-1]
+#         ntr.append(1)
+#         tr = ntr[:]
+#
+#
+# n = 0
+# results = []
+# for t in triangles():
+#     print(t)
+#     results.append(t)
+#     n = n + 1
+#     if n == 10:
+#         break
+# if results == [
+#     [1],
+#     [1, 1],
+#     [1, 2, 1],
+#     [1, 3, 3, 1],
+#     [1, 4, 6, 4, 1],
+#     [1, 5, 10, 10, 5, 1],
+#     [1, 6, 15, 20, 15, 6, 1],
+#     [1, 7, 21, 35, 35, 21, 7, 1],
+#     [1, 8, 28, 56, 70, 56, 28, 8, 1],
+#     [1, 9, 36, 84, 126, 126, 84, 36, 9, 1]
+# ]:
+#     print('测试通过!')
+# else:
+#     print('测试失败!')
 
-#打印g中的所有元素
-# for n in g:
-#     print(n)
 
-# generator非常强大。如果推算的算法比较复杂
-# 用类似列表生成式的for循环无法实现的时候，还可以用函数来实现
-def fib(max):
-    n, a, b = 0, 0, 1
-    while n < max:
-        print(b)
-        a, b = b, a + b
-        n = n + 1
-    return 'done'
+from collections import Iterable
 
-# fib(6)
+# 可以直接作用于for循环的对象统称为迭代对象：Iterable
+# 使用isinstance()判断一个对象是否为Iterable
+print(isinstance([], Iterable))
+print(isinstance(123, Iterable))
+print(isinstance((x for x in range(10)), Iterable))
 
-# 修改上边函数为generator
-# 要把fib函数变成generator，只需要把print(b)改为yield b就可以了
-def fib(max):
-    n, a, b = 0, 0, 1
-    while n < max:
-        yield b
-        a, b = b, a + b
-        n = n + 1
-    return 'done'
+# 可以被next()函数调用并不断返回下一个值的对象称为迭代器：Iterator
+# 可以使用isinstance()判断一个对象是否是Iterator对象
+from collections import Iterator
 
-
-f = fib(6)
-print(f)
-# 这是定义generator的另一种方法。如果一个函数定义中包含yield关键字
-# 那么这个函数就不再是一个普通函数，而是一个generator
-# for n in fib(6):
-#     print(n)
-
-# 捕获错误的发生
-g = fib(6)
-while True:
-    try:
-        x = next(g)
-        print('g:', x)
-    except StopIteration as e:
-        print('Generator return value:', e.value)
-        break
-
-
-def triangles():
-    a, b = 1, 1
-    while True:
-
+print(isinstance('abc', Iterator))
+print(isinstance((x for x in range(10)), Iterator))
+# 把list、dict、str等Iterable变成Iterator可以使用iter()函数
+print(isinstance(iter([]), Iterator))
+print(isinstance(iter('abc'), Iterator))

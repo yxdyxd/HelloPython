@@ -574,16 +574,124 @@ from collections import Iterable
 
 # 可以直接作用于for循环的对象统称为迭代对象：Iterable
 # 使用isinstance()判断一个对象是否为Iterable
-print(isinstance([], Iterable))
-print(isinstance(123, Iterable))
-print(isinstance((x for x in range(10)), Iterable))
+# print(isinstance([], Iterable))
+# print(isinstance(123, Iterable))
+# print(isinstance((x for x in range(10)), Iterable))
 
 # 可以被next()函数调用并不断返回下一个值的对象称为迭代器：Iterator
 # 可以使用isinstance()判断一个对象是否是Iterator对象
 from collections import Iterator
 
-print(isinstance('abc', Iterator))
-print(isinstance((x for x in range(10)), Iterator))
+
+# print(isinstance('abc', Iterator))
+# print(isinstance((x for x in range(10)), Iterator))
 # 把list、dict、str等Iterable变成Iterator可以使用iter()函数
-print(isinstance(iter([]), Iterator))
-print(isinstance(iter('abc'), Iterator))
+# print(isinstance(iter([]), Iterator))
+# print(isinstance(iter('abc'), Iterator))
+
+
+# 函数名也是变量，可以通过赋值把一个整数赋值给函数名
+# 既然变量可以指向函数，函数的参数能接收变量
+# 那么一个函数就可以接收另一个函数作为参数，这种函数就称之为高阶函数
+# 列举一个简单的高阶函数
+def add(x, y, f):
+    return f(x) + f(y)
+
+
+# print(add(-5, 6, abs))
+
+
+# map()函数接收两个参数，一个是函数，一个是Iterable
+# 一个函数f(x)=x2(x的平方)
+# 把这个函数作用在一个list [1, 2, 3, 4, 5, 6, 7, 8, 9]上
+def f(x):
+    return x * x
+
+
+r = map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+# print(list(r))
+
+# reduce把一个函数作用在一个序列[x1, x2, x3, ...]上
+# 这个函数必须接收两个参数
+# reduce把结果继续和序列的下一个元素做累积计算
+# 等价于:reduce(f,[x1, x2, x3, x4]) = f(f(f(x1, x2), x3),x4)
+from functools import reduce
+
+
+def add(x, y):
+    return x + y
+
+
+# print(reduce(add, [1, 3, 5, 7, 9]))
+
+
+def fn(x, y):
+    return x * 10 + y
+
+
+print(reduce(fn, [1, 3, 5, 7, 9]))
+
+
+def charm2num(s):
+    digits = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, \
+              '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
+    return digits[s]
+
+
+# print(reduce(fn, map(charm2num, '13579')))
+#
+# print(charm2num('5'))
+# print(list(map(charm2num, '12345')))
+
+DIGITS = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, \
+          '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
+
+
+def str2int(s):
+    def fn(x, y):
+        return x * 10 + y
+    def charm2num(s):
+        return DIGITS[s]
+    return reduce(fn, map(charm2num, s))
+
+
+# print(str2int('123456'))
+
+
+# 继续简化
+def charm2num(s):
+    return DIGITS[s]
+
+
+def str2int(s):
+    return reduce(lambda x, y:x * 10 + y, map(charm2num, s))
+
+
+# print(str2int('1234'))
+
+
+def normalize(name):
+        str1 = name[:1].upper() + name[1:].lower()
+        return str1
+
+
+L1 = ['adam', 'LISA', 'barT']
+L2 = list(map(normalize, L1))
+print(L2)
+
+
+def prod(L):
+    def sum1(x, y):
+        return x * y
+    return reduce(sum1, L)
+
+
+print('3 * 5 * 7 * 9 =', prod([3, 5, 7, 9]))
+if prod([3, 5, 7, 9]) == 945:
+    print('测试成功!')
+else:
+    print('测试失败!')
+
+
+def str2float(s):
+

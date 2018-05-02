@@ -650,8 +650,10 @@ DIGITS = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, \
 def str2int(s):
     def fn(x, y):
         return x * 10 + y
+
     def charm2num(s):
         return DIGITS[s]
+
     return reduce(fn, map(charm2num, s))
 
 
@@ -664,15 +666,15 @@ def charm2num(s):
 
 
 def str2int(s):
-    return reduce(lambda x, y:x * 10 + y, map(charm2num, s))
+    return reduce(lambda x, y: x * 10 + y, map(charm2num, s))
 
 
 # print(str2int('1234'))
 
 
 def normalize(name):
-        str1 = name[:1].upper() + name[1:].lower()
-        return str1
+    str1 = name[:1].upper() + name[1:].lower()
+    return str1
 
 
 L1 = ['adam', 'LISA', 'barT']
@@ -683,6 +685,7 @@ print(L2)
 def prod(L):
     def sum1(x, y):
         return x * y
+
     return reduce(sum1, L)
 
 
@@ -694,4 +697,16 @@ else:
 
 
 def str2float(s):
+    return reduce(lambda x, y: x * 10 + y, \
+                  map(int, s.split('.')[0])) + \
+           reduce(lambda x, y: x / 10 + y, \
+                  map(int, s.split('.')[-1][::-1])) / 10
+
+
+print('str2float(\'123.456\') =', str2float('123.456'))
+if abs(str2float('123.456') - 123.456) < 0.00001:
+    print('测试成功!')
+else:
+    print('测试失败!')
+
 

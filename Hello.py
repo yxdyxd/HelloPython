@@ -1509,70 +1509,201 @@
 #
 #
 
+# class Student(object):
+#     pass
+#
+#
+# # 使用__slots__
+# s = Student()
+# # 绑定一个实例属性
+# s.age = 10
+# print(s.age)
+#
+#
+# # 给实例绑定一个方法
+# def set_age(self, age):
+#     self.age = age
+#
+#
+# from types import MethodType
+#
+# # 给实例绑定一个方法
+# s.set_age = MethodType(set_age, s)
+# s.set_age(12)
+# print(s.age)
+#
+# # 对实例绑定的方法在另一个新建的实例上不起作用
+# s2 = Student()
+#
+#
+# # s2.set_age(13)
+#
+#
+# # 但是在类中定义方法，可以让所有的实例都绑定上
+# def set_score(self, score):
+#     self.score = score
+#
+#
+# # 类方法绑定
+# Student.set_score = set_score
+# # 调用类的方法
+# s2.set_score(100)
+# print(s2.score)
+#
+#
+# # 通过使用__slots__来限制实例类的属性
+# # 只允许Student添加name和score
+# class Student(object):
+#     __slots__ = ('name', 'age') # 用tuple定义允许绑定的属性名称
+#
+#
+# # 创建新的实例
+# s = Student()
+# # 绑定属性
+# s.name = 'mike'
+# s.age = 12
+# # 绑定额外的score属性,score没在tuple中，所以会报错
+# # s.score = 100
+#
+#
+# # 使用__slots__要注意，__slots__定义的属性仅对当前类实例起作用，对继承的子类是不起作用的：
+# class GraduateStudent(Student):
+#     pass
+#
+#
+# g = GraduateStudent()
+# g.score = 100
+
+
 class Student(object):
+
+    # 使用@property，把一个方法变成属性来调用
+    @property
+    def score(self):
+        return self._score
+
+    @score.setter
+    def score(self, value):
+        if not isinstance(value, int):
+            raise ValueError('score must be an integer!')
+        if value < 0 or value > 100:
+            raise ValueError('score must be between 0 ~ 100!')
+        self._score = value
+
+
+s = Student()
+s.score = 60  # 实际转化为s.set_score(60)
+print(s.score)  # 实际转化为s.get_score()
+
+
+# s.score = 9999  # 传入的参数超出界定的范围
+
+
+# 设置只读属性
+class Student(object):
+
+    @property  # 只加@property的话，相当只设置了属性的getter方法，即已读属性
+    def birth(self):
+        return self._birth
+
+    @birth.setter  # 添加setter属性，操作属性
+    def birth(self, value):
+        self._birth = value
+
+    @property
+    def age(self):
+        return 2015 - self._birth
+
+
+# 请利用@property给一个Screen对象加上width和height属性，以及一个只读属性resolution：
+class Screen(object):
+
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        self._width = value
+
+    @property
+    def height(self):
+        return self._height
+
+    @height.setter
+    def height(self, value):
+        self._height = value
+
+    @property
+    def resolution(self):
+        return self._width * self._height
+
+# 测试:
+s = Screen()
+s.width = 1024
+s.height = 768
+print('resolution =', s.resolution)
+if s.resolution == 786432:
+    print('测试通过!')
+else:
+    print('测试失败!')
+
+
+# 多重继承
+class Animal(object):
     pass
 
 
-# 使用__slots__
-s = Student()
-# 绑定一个实例属性
-s.age = 10
-print(s.age)
-
-
-# 给实例绑定一个方法
-def set_age(self, age):
-    self.age = age
-
-
-from types import MethodType
-
-# 给实例绑定一个方法
-s.set_age = MethodType(set_age, s)
-s.set_age(12)
-print(s.age)
-
-# 对实例绑定的方法在另一个新建的实例上不起作用
-s2 = Student()
-
-
-# s2.set_age(13)
-
-
-# 但是在类中定义方法，可以让所有的实例都绑定上
-def set_score(self, score):
-    self.score = score
-
-
-# 类方法绑定
-Student.set_score = set_score
-# 调用类的方法
-s2.set_score(100)
-print(s2.score)
-
-
-# 通过使用__slots__来限制实例类的属性
-# 只允许Student添加name和score
-class Student(object):
-    __slots__ = ('name', 'age') # 用tuple定义允许绑定的属性名称
-
-
-# 创建新的实例
-s = Student()
-# 绑定属性
-s.name = 'mike'
-s.age = 12
-# 绑定额外的score属性,score没在tuple中，所以会报错
-# s.score = 100
-
-
-# 使用__slots__要注意，__slots__定义的属性仅对当前类实例起作用，对继承的子类是不起作用的：
-class GraduateStudent(Student):
+# 大类,Mammal:哺乳动物
+class Mammal(Animal):
     pass
 
 
-g = GraduateStudent()
-g.score = 100
+class Bird(Animal):
+    pass
+
+
+# 各种动物
+class Dog(Mammal):
+    pass
+
+
+class Bat(Mammal):
+    pass
+
+
+# 鹦鹉
+class Parrot(Bird):
+    pass
+
+
+# 鸵鸟
+class Ostrich(Bird):
+    pass
+
+
+# 加上Runnable和Flyable
+class Runnable(object):
+    def run(self):
+        print('Running...')
+
+
+class Flyable(object):
+    def fly(self):
+        print('Flying...')
+
+
+# 需要runnable功能的动物，多继承一个Runnable
+class Dog(Mammal, Runnable):
+    pass
+
+
+# 通过多重继承，一个子类就能获取多个父类的所有功能
+
+
+
+
+
 
 
 

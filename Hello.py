@@ -1700,11 +1700,107 @@ class Dog(Mammal, Runnable):
 
 # 通过多重继承，一个子类就能获取多个父类的所有功能
 
+# MixIn：通常，主线都是单一继承下来的，例如，Ostrich继承自Bird。\
+# 但是，如果需要“混入”额外的功能，通过多重继承就可以实现，\
+# 比如，让Ostrich除了继承自Bird外，再同时继承Runnable
+# 这种设计通常称之为MixIn
+
+# Python自带的很多库也使用了MixIn。\
+# 举个例子，Python自带了TCPServer和UDPServer这两类网络服务，\
+# 而要同时服务多个用户就必须使用多进程或多线程模型，\
+# 这两种模型由ForkingMixIn和ThreadingMixIn提供。\
+# 通过组合，我们就可以创造出合适的服务来。
+
+# 例如编写一个多进程的TCP服务
+# class MyTCPServer(TCPServer, ForkingMixIn):
+#     pass
 
 
+# 定制类：
+class Student(object):
+    def __init__(self, name):
+        self.name = name
 
 
+print(Student('mike'))
 
+
+# 利用__str__来返回一个规定字符串
+class Student(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return 'Student object (name: %s)' % self.name
+
+
+print(Student('bob'))
+s = Student('jack')
+print(s)
+
+
+# __iter__：类似于循环for...in
+class Fib(object):
+    def __init__(self):
+        self.a, self.b = 0, 1    # 初始化两个计数器a，b
+
+    def __iter__(self):
+        return self              # 实例本身就是迭代对象，故返回自己
+
+    def __next__(self):
+        self.a, self.b = self.b, self.a + self.b   # 计算下一个值
+        if self.a > 100000:    # 设置退出循环条件
+            raise StopIteration()
+        return self.a
+
+
+for n in Fib():
+    print(n)
+
+
+# __getitem__: 取出__iter__中的元素
+class Fib(object):
+    def __getitem__(self, n):
+        a, b = 1, 1
+        for x in range(n):
+            a, b = b, a + b
+        return a
+
+
+# 取出任一特定的元素
+f = Fib()
+print(f[0])
+print(f[3])
+
+
+# 但是这个方法不能进行切片操作，想要进行进行切片需要进一步完善功能
+class Fib(object):
+    def __getitem__(self, n):
+        if isinstance(n, int):  # n是索引
+            a, b = 1, 1
+            for x in range(n):
+                a, b = b, a + b
+            return a
+        if isinstance(n, slice):  # n是切片
+            start = n.start
+            stop = n.stop
+            if start is None:
+                start = 0
+            a, b = 1, 1
+            L = []
+            for x in range(stop):
+                if x >= start:
+                    L.append(a)
+                a, b = b, a + b
+            return L
+
+
+# 实验Fib的切片
+f = Fib()
+print(f[0:5])
+# 此方法没有对负数做处理。所以，实现一个__getitem__需要做很多的工作
+# 与之对应的是__setitem__()方法，把对象视作list或dict来对集合赋值\
+# 最后，还有一个__delitem__()方法，用于删除某个元素。
 
 
 

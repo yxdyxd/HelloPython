@@ -1638,6 +1638,7 @@ class Screen(object):
     def resolution(self):
         return self._width * self._height
 
+
 # 测试:
 s = Screen()
 s.width = 1024
@@ -1742,14 +1743,14 @@ print(s)
 # __iter__：类似于循环for...in
 class Fib(object):
     def __init__(self):
-        self.a, self.b = 0, 1    # 初始化两个计数器a，b
+        self.a, self.b = 0, 1  # 初始化两个计数器a，b
 
     def __iter__(self):
-        return self              # 实例本身就是迭代对象，故返回自己
+        return self  # 实例本身就是迭代对象，故返回自己
 
     def __next__(self):
-        self.a, self.b = self.b, self.a + self.b   # 计算下一个值
-        if self.a > 100000:    # 设置退出循环条件
+        self.a, self.b = self.b, self.a + self.b  # 计算下一个值
+        if self.a > 100000:  # 设置退出循环条件
             raise StopIteration()
         return self.a
 
@@ -1798,9 +1799,102 @@ class Fib(object):
 # 实验Fib的切片
 f = Fib()
 print(f[0:5])
+
+
 # 此方法没有对负数做处理。所以，实现一个__getitem__需要做很多的工作
 # 与之对应的是__setitem__()方法，把对象视作list或dict来对集合赋值\
 # 最后，还有一个__delitem__()方法，用于删除某个元素。
+
+
+# __getattr__：使用此属性，动态返回一个属性
+class Student(object):
+
+    def __init__(self):
+        self.name = 'mike'
+
+
+# 调用不存在的score，此时就会报错
+s = Student()
+# 调用name属性
+print(s.name)
+
+
+# 调用不存在的score属性
+# print(s.score)
+
+# 动态返回属性
+class Student(object):
+
+    def __init__(self):
+        self.name = 'Bob'
+
+    def __getattr__(self, item):
+        if item == 'score':
+            return 99
+
+
+s = Student()
+print(s.score)
+
+
+# 也可返回一个函数
+class Student(object):
+
+    def __getattr__(self, item):
+        if item == 'age':
+            return lambda: 25
+
+
+s = Student()
+print(s.age())
+
+# 在没有找到属性的情况下，才会从__getattr__中寻找，例如，name已有属性，不会寻找
+
+
+# 此外，注意到任意调用如s.abc都会返回None，这是因为我们定义的__getattr__默认返回就是None。\
+# 要让class只响应特定的几个属性，我们就要按照约定，抛出AttributeError的错误：
+class Student(object):
+
+    def __getattr__(self, item):
+        if item == 'age':
+            return lambda: 25
+        raise AttributeError('\'Student\' object has no attribution\
+        \'%s\'' % item)
+
+
+s = Student()
+# 错误示例，打印自定义报错信息
+# print(s.ag())
+
+
+# 利用完全动态__getattr__，写出一个链式调用
+class China(object):
+
+    def __init__(self, path=''):
+        self._path = path
+
+    def __getattr__(self, path):
+        return China('%s/%s' % (self._path, path))
+
+    def __str__(self):
+        return self._path
+
+    __repr__ = __str__
+
+
+# 链式程序调用
+print(China().status.user.timeline.list)
+# 更改字串
+
+print(China().user('bob').repos)
+
+
+
+
+
+
+
+
 
 
 

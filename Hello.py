@@ -1918,64 +1918,64 @@
 #
 
 
-from enum import Enum
-
-# 枚举类：
-Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May',
-                       'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
-                       'Nov', 'Dec'))
-# 直接使用Month.Jan来引用一个常量，或者枚举它的所有成员
-# value属性是自动赋给成员的int常量，默认从1开始计数
-for name, member in Month.__members__.items():
-    print(name, '=>', member, ',', member.value)
-
-
-# Enum派生自定义类，来更精准的控制枚举类型
-from enum import Enum, unique
-
-
-# unique装饰器可以帮助我们检查有没有重复值
-@unique
-class Weekday(Enum):
-    sun = 0  # sun的Value被设定为0
-    Mon = 1
-    Tue = 2
-    Wed = 3
-    Thu = 4
-    Fri = 5
-    Sat = 6
-
-
-# 访问枚举类型
-day1 = Weekday.Mon
-print(day1)
-print(Weekday['Tue'])
-print(Weekday.Tue.value)
-print(Weekday.Mon == day1)
-print(Weekday(1))
-
-for name, member in Weekday.__members__.items():
-    print(name, '=>', member)
-
-
-class Gender(Enum):
-    Male = 0
-    Female = 1
-
-
-class Student(object):
-
-    def __init__(self, name, gender):
-        self.name = name
-        self.gender = gender
-
-
-# 测试:
-bart = Student('Bart', Gender.Male)
-if bart.gender == Gender.Male:
-    print('测试通过!')
-else:
-    print('测试失败!')
+# from enum import Enum
+#
+# # 枚举类：
+# Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May',
+#                        'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
+#                        'Nov', 'Dec'))
+# # 直接使用Month.Jan来引用一个常量，或者枚举它的所有成员
+# # value属性是自动赋给成员的int常量，默认从1开始计数
+# for name, member in Month.__members__.items():
+#     print(name, '=>', member, ',', member.value)
+#
+#
+# # Enum派生自定义类，来更精准的控制枚举类型
+# from enum import Enum, unique
+#
+#
+# # unique装饰器可以帮助我们检查有没有重复值
+# @unique
+# class Weekday(Enum):
+#     sun = 0  # sun的Value被设定为0
+#     Mon = 1
+#     Tue = 2
+#     Wed = 3
+#     Thu = 4
+#     Fri = 5
+#     Sat = 6
+#
+#
+# # 访问枚举类型
+# day1 = Weekday.Mon
+# print(day1)
+# print(Weekday['Tue'])
+# print(Weekday.Tue.value)
+# print(Weekday.Mon == day1)
+# print(Weekday(1))
+#
+# for name, member in Weekday.__members__.items():
+#     print(name, '=>', member)
+#
+#
+# class Gender(Enum):
+#     Male = 0
+#     Female = 1
+#
+#
+# class Student(object):
+#
+#     def __init__(self, name, gender):
+#         self.name = name
+#         self.gender = gender
+#
+#
+# # 测试:
+# bart = Student('Bart', Gender.Male)
+# if bart.gender == Gender.Male:
+#     print('测试通过!')
+# else:
+#     print('测试失败!')
 
 
 # 使用元类
@@ -1983,13 +1983,121 @@ else:
 # 而是运行时动态创建的
 # 创建class的方法：使用type()函数
 # 首先定义函数
-def fn(self, name='world'):
-    print('Hello, %s' % name)
+# def fn(self, name='world'):
+#     print('Hello, %s' % name)
+#
+#
+# # 动态创建类
+# Hello = type('Hello', (object,), dict(hello=fn))
+# h = Hello()
+# h.hello()
+#
+#
+# # metaclass：先定义metaclass，再创建类，最后创建实例
+# # metaclass类名总是以Metaclass结尾，以便于区分
+# class ListMetaclass(type):
+#
+#     def __new__(cls, name, bases, attrs):
+#         attrs['add'] = lambda self, value: self.append(value)
+#         return type.__new__(cls, name, bases, attrs)
+#
+#
+# # 有了ListMetaclass，我们在定义类的时候还要指示使用ListMetaclass来定制类
+# # 传入关键字参数metaclass：
+# class MyList(list, metaclass=ListMetaclass):
+#     pass
+#
+#
+# L = MyList()
+# L.add(1)
+# print(L)
+
+print('')
 
 
-# 创建类
-Hello = type('Hello', (object,), dict(hello=fn))
-h = Hello()
-h.hello()
+# 定义一个Field类，负责保存数据库的字段名和字段类型
+class Field(object):
+
+    def __init__(self, name, column_type):
+        self.name = name
+        self.column_type = column_type
+
+    def __str__(self):
+        return '<%s:%s>' % (self.__class__.__name__, self.name)
+
+
+# 在Field的基础上，进一步定义各种类型的Field
+class StringField(Field):
+
+    def __init__(self, name):
+        super(StringField, self).__init__(name, 'varchar(100)')
+
+
+class IntegerField(Field):
+
+    def __init__(self, name):
+        super(IntegerField, self).__init__(name, 'bigiht')
+
+
+# 编写metaclass
+class ModelMetaclass(type):
+
+    def __new__(cls, name, bases, attrs):
+        if name == 'Model':
+            return type.__new__(cls, name, bases, attrs)
+        print('Found model: %s' % name)
+        mappings = dict()
+        for k, v in attrs.items():
+            if isinstance(v, Field):
+                print('Found mapping: %s ==> %s' % (k, v))
+                mappings[k] = v
+        for k in mappings.keys():
+            attrs.pop(k)
+        attrs['__mappings__'] = mappings
+        attrs['__table__'] = name
+        return type.__new__(cls, name, bases, attrs)
+
+
+# 基类Model
+class Model(dict, metaclass=ModelMetaclass):
+
+    def __init__(self, **kw):
+        super(Model, self).__init__(**kw)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Model' object has no \
+            attribute '%s'" % key)
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def save(self):
+        fields = []
+        params = []
+        args = []
+        for k, v in self.__mappings__.items():
+            fields.append(v.name)
+            params.append('?')
+            args.append(getattr(self, k, None))
+        sql = 'insert into %s (%s) value (%s)' % (self.__table__,
+                                                  ','.join(fields)
+                                                  .join(params))
+        print('SQL: %s' % sql)
+        print("ARGS: %s" % str(args))
+
+
+u = User(id=12345, name='Michael', email='test@orm.org',
+          password='my-pwd')
+u.save()
+
+
+
+
+
+
+
 
 

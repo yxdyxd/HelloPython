@@ -2560,13 +2560,194 @@ print(f.getvalue())
 
 # 和StringIO类似，可以用一个bytes初始化BytesIO，然后，像读文件一样读取：
 from io import BytesIO
+
 f = BytesIO(b'\xe4\xb8\xad\xe6\x96\x87')
 print(f.read())
 
+# 操作文件和目录
+# Python内置的os模块也可以直接调用操作系统提供的接口函数
+import os
+
+print(os.name)
+# 获取详细的系统信息，可以调用uname()函数：
+print(os.uname())
+
+# 环境变量
+# 在操作系统中定义的环境变量，全部保存在os.environ这个变量中，可以直接查看
+print(os.environ)
+# 获取某个环境变量的值
+print(os.environ.get("PATH"))
+print(os.environ.get('x', 'default'))
+
+# 操作文件和目录
+# 查看当前目录的绝对路径
+print(os.path.abspath('.'))
+# 在某个目录下创建一个新的项目，首先把新目录的完整路径表示出来
+print(os.path.join('/Users/yangxudong/Desktop', 'testdir'))
+# 然后创建一个目录
+# os.mkdir('/Users/yangxudong/Desktop/testdir')
+# 删掉一个目录
+# os.rmdir('/Users/yangxudong/Desktop/testdir')
+# 把两个路径合成一个
+# 不要直接拼字符串，而要通过os.path.join()函数，这样可以正确处理不同操作系统的路径分隔符
+# 在Linux/Unix/Mac下，os.path.join()返回这样的字符串
+# part-1/part-2
+
+# 而Windows下会返回这样的字符串：
+# part-1\part-2
+
+# 同样的道理，要拆分路径时，也不要直接去拆字符串，
+# 而要通过os.path.split()函数，这样可以把一个路径拆分为两部分，
+# 后一部分总是最后级别的目录或文件名：
+print(os.path.split('/Users/yangxudong/Desktop/testdir'))
+# 获得文件的扩展名
+# 这些合并、拆分路径的函数并不要求目录和文件要真实存在，它们只对字符串进行操作
+print(os.path.splitext('/Users/yangxudong/Desktop/testdir/house.png'))
+# 对文件重命名
+# 重命名之后，如果不加路径。文件就会更改位置，所以需要加上更改后的路径
+# os.rename('/Users/yangxudong/Desktop/testdir/222.png',
+#           '/Users/yangxudong/Desktop/testdir/111.png')
+# os中不存在复制模块
+# 幸运的是shutil模块提供了copyfile()的函数
+# 你还可以在shutil模块中找到很多实用函数，它们可以看做是os模块的补充
+print([x for x in os.listdir('.') if os.path.isdir(x)])
+# 列出所有的.py文件
+print(x for x in os.listdir('.') if os.path.isfile(x) and
+      os.path.splitext(x)[1] == '.py')
+
+# import os
+# import os.path as op
+#
+# inp = input('请输入字符串，我将为你查找是否有包含字符串的文件:')
+#
+#
+# def get_files(inp, n_dir='.'):
+#     x = os.listdir(n_dir)
+#     if x == False:
+#         pass
+#     for fi in x:
+#         if op.isdir(fi):
+#             get_files(inp, fi)
+#         else:
+#             file = op.split(fi)
+#             if inp in file[1]:
+#                 print(file[1])
+#
+#
+# get_files(inp)
 
 
+# import os
+#
+# s = input('Input the string you want find:')
+# ls = []
+# for x in os.listdir('.'):
+#     if s in x:
+#         ls.append(x)
+#         print(x, "\n")
+#     if os.path.isdir(x):
+#         for y in os.listdir('./' + x):
+#             if s in y:
+#                 ls.append('./' + y)
+#                 print('./' + y + "\n")
+# print(ls)
+
+# 序列化
+# 在程序运行过程中，所有的变量都是在内存中，比如，定义一个dict
+# 可以随时修改变量，比如把name改成'Bill'，
+# 但是一旦程序结束，变量所占用的内存就被操作系统全部回收。
+# 如果没有把修改后的'Bill'存储到磁盘上，下次重新运行程序，变量又被初始化为'Bob'
+# d = dict(name='Bob', age=20, socre=88)
+
+# 我们把变量从内存中变成可存储或传输的过程称之为序列化，
+# 在Python中叫pickling，
+# 在其他语言中也被称之为serialization，marshalling，flattening等等，都是一个意思
+# 序列化之后，就可以把序列化后的内容写入磁盘，或者通过网络传输到别的机器上。
+# 反过来，把变量内容从序列化的对象重新读到内存里称之为反序列化，即unpickling
+# Python提供了pickle模块来实现序列化
+import pickle
+
+# 把一个对象序列化并写入文件
+d = dict(name='Bob', age=20, score=88)
+print(pickle.dumps(d))
+
+# pickle.dumps()方法把任意对象序列化成一个bytes，
+# 然后，就可以把这个bytes写入文件。
+# 或者用另一个方法pickle.dump()直接把对象序列化后写入一个file-like Object
+# f = open('dump.text', 'wb')
+# pickle.dump(d, f)
+# f.close()
+# print(d)
+
+# Python转变为json数据
+import json
+
+d = dict(name='Bob', age=20, score=88)
+# print(json.dumps(d))
+
+# dumps()方法返回一个str，内容就是标准的json
+# 类似的，dump()方法可以直接把JSON写入一个file-like Object
+
+# 要把JSON反序列化为Python对象，用loads()或者对应的load()方法，
+# 前者把JSON的字符串反序列化，后者从file-like Object中读取字符串并反序列化
+# 由于JSON标准规定JSON编码是UTF-8，
+# 所以我们总是能正确地在Python的str与JSON的字符串之间转换。
+json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+# print(json.loads(json_str))
+
+# Python的dict对象可以直接序列化为JSON的{}，
+# 不过，很多时候，我们更喜欢用class表示对象，比如定义Student类，然后序列化：
+import json
 
 
+class Student(object):
+
+    def __init__(self, name, age, score):
+        self.name = name
+        self.age = age
+        self.score = score
+
+
+# 此处无法直接将class转化为json
+s = Student('Bob', 20, 88)
+
+
+# print(json.dumps(s))
+
+# 可选参数default就是把任意一个对象变成一个可序列为JSON的对象，
+# 我们只需要为Student专门写一个转换函数，再把函数传进去即可
+def student2dict(std):
+    return {
+        'name': std.name,
+        'age': std.age,
+        'score': std.score
+    }
+
+
+# Student实例首先被student2dict()函数转换成dict，然后再被顺利序列化为JSON
+print(json.dumps(s, default=student2dict))
+# 不过，下次如果遇到一个Teacher类的实例，照样无法序列化为JSON。
+# 我们可以偷个懒，把任意class的实例变为dict：
+# 通常class的实例都有一个__dict__属性，实际上就是一个dict，用来存储少量数据
+# 也有少数列外，例如定义了__slots__属性的class
+print(json.dumps(s, default=lambda obj: obj.__dict__))
+
+
+# 同样的道理，如果我们要把JSON反序列化为一个Student对象实例，
+# loads()方法首先转换出一个dict对象，
+# 然后，我们传入的object_hook函数负责把dict转换为Student实例
+def dict2student(d):
+    return Student(d['name'], d['age'], d['score'])
+
+
+json_str = '{"age": 20, "score": 88, "name": "Bob"}'
+# 打印出的是反序列化的Student实例对象
+print(json.loads(json_str, object_hook=dict2student))
+
+
+obj = dict(name='小明', age=20)
+s = json.dumps(obj, ensure_ascii=True)
+print(s)
 
 
 

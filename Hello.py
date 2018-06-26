@@ -2749,7 +2749,7 @@
 # s = json.dumps(obj, ensure_ascii=True)
 # print(s)
 
-import os
+# import os
 
 # print('Process (%s) start...' % os.getpid())
 
@@ -2834,41 +2834,204 @@ import os
 # 进程间的通信
 # Process之间肯定是需要通信的，操作系统提供了很多机制来实现进程间的通信。
 # Python的multiprocessing模块包装了底层的机制，提供了Queue、Pipes等多种方式来交换数据。
-from multiprocessing import Process, Queue
-import os, time, random
+# from multiprocessing import Process, Queue
+# import os, time, random
+#
+#
+# # 写数据进程执行的代码
+# # getpid返回当前进程标识，getppid返回父进程标识。
+# def write(q):
+#     print('Process to write: %s' % os.getpid())
+#     for value in ['A', 'B', 'C']:
+#         print('Put %s to queue...' % value)
+#         q.put(value)
+#         time.sleep(random.random())
+#
+#
+# # 读取数据进程执行的代码
+# def read(q):
+#     print('Process to read: %s' % os.getpid())
+#     while True:
+#         value = q.get(True)
+#         print('Get %s from queue.' % value)
+#
+#
+# if __name__ == '__main__':
+#     # 父进程创建Queue，并传给各个子进程
+#     q = Queue()
+#     pw = Process(target=write, args=(q,))
+#     pr = Process(target=read, args=(q,))
+#     # 启动子进程pw，写入：
+#     pw.start()
+#     # 启动子进程，读取：
+#     pr.start()
+#     # 等待pw结束
+#     pw.join()
+#     # pr进程里是死循环，无法等待其结束，只能强行终止
+#     pr.terminate()
+
+print('')
+# 多任务可以由多进程完成，也可以由一个进程内的多线程完成
+# Python的标准库提供了两个模块：_thread和threading，
+# _thread是低级模块，threading是高级模块，对_thread进行了封装。
+# 绝大多数情况下，我们只需要使用threading这个高级模块
+
+# 启动一个线程就是把一个函数传入并创建Thread实例，然后调用start()开始执行
+# 由于任何进程默认就会启动一个线程，我们把该线程称为主线程，主线程又可以启动新的线程，
+# Python的threading模块有个current_thread()函数，它永远返回当前线程的实例。
+# 主线程实例的名字叫MainThread，子线程的名字在创建时指定，我们用LoopThread命名子线程。
+# 名字仅仅在打印时用来显示，完全没有其他意义，
+# 如果不起名字Python就自动给线程命名为Thread-1，Thread-2……
+# import time, threading
+#
+#
+# def loop():
+#     print('thread %s is running...' % threading.current_thread().name)
+#     n = 0
+#     while n < 5:
+#         n = n + 1
+#         print('thread %s >>> %s' % (threading.current_thread().name, n))
+#         time.sleep(1)
+#     print('thread %s ended.' % threading.current_thread().name)
+#
+#
+# print('thread %s is running...' % threading.current_thread().name)
+# t = threading.Thread(target=loop, name='LoopThread')
+# t.start()
+# t.join()
+# print('thread %s ended.' % threading.current_thread().name)
+
+# 多线程之间最大的问题在于，多个线程同时操作一个变量，造成内容混乱
+# 当t1、t2交替执行时，只要循环次数足够多，balance的结果就不一定是0了
+import time, threading
+
+balance = 0
 
 
-# 写数据进程执行的代码
-# getpid返回当前进程标识，getppid返回父进程标识。
-def write(q):
-    print('Process to write: %s' % os.getpid())
-    for value in ['A', 'B', 'C']:
-        print('Put %s to queue...' % value)
-        q.put(value)
-        time.sleep(random.random())
+def change_it(n):
+    # 先存后取，结果应该为0
+    global balance
+    balance = balance + n
+    balance = balance - n
 
 
-# 读取数据进程执行的代码
-def read(q):
-    print('Process to read: %s' % os.getpid())
-    while True:
-        value = q.get(True)
-        print('Get %s from queue.' % value)
+def run_thread(n):
+    for i in range(100000):
+        change_it(n)
 
 
-if __name__ == '__main__':
-    # 父进程创建Queue，并传给各个子进程
-    q = Queue()
-    pw = Process(target=write, args=(q,))
-    pr = Process(target=read, args=(q,))
-    # 启动子进程pw，写入：
-    pw.start()
-    # 启动子进程，读取：
-    pr.start()
-    # 等待pw结束
-    pw.join()
-    # pr进程里是死循环，无法等待其结束，只能强行终止
-    pr.terminate()
+t1 = threading.Thread(target=run_thread, args=(5,))
+t2 = threading.Thread(target=run_thread, args=(5,))
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+print('no lock %s' % balance)
+
+
+# 在一个线程修改balance时，别的线程不能对balance修改
+# 对线程进行加锁：同一时刻最多只有一个线程持有锁
+
+balance = 0
+lock = threading.Lock()
+
+
+def run_thread(n):
+    for i in range(100000):
+        # 先要获取锁
+        lock.acquire()
+        try:
+            # 修改
+            change_it(n)
+        finally:
+            # 修改完成之后，释放锁🔐
+            lock.release()
+
+
+# 当多个线程同时执行lock.acquire()时，只有一个线程能成功的获取锁
+# 然后继续执行代码，其他线程持续等待，直到获取锁为止
+# 我们用try...finally来确保锁一定会被释放
+
+
+# ThreadLocal
+# 在多线程环境下，每个线程都有自己的数据。
+# 一个线程使用自己的局部变量比使用全局变量好，
+# 因为局部变量只有线程自己能看见，不会影响其他线程，而全局变量的修改必须加锁。
+# 使用局部变量的问题，在函数调用的时候，传递起来很麻烦
+
+# class Student(object):
+#
+#     def __init__(self, name, score):
+#         self.name = name
+#         self.score = score
+#
+#     pass
+
+
+# def process_student(name):
+#     # std是局部变量，但是每个函数都要用它，因此必须传进去：
+#     std = Student(name)
+#     do_task_1(std)
+#     do_task_2(std)
+#
+#
+# def do_task_1(std):
+#     do_subtask_1(std)
+#     do_subtsak_2(std)
+#
+#
+# def do_task_2(std):
+#     do_subtask_2(std)
+#     do_subtask_2(std)
+
+# 创建全局Threading对象
+# ThreadLocal最常用的地方就是为每个线程绑定一个数据库连接，
+# HTTP请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
+import threading
+
+local_school = threading.local()
+
+
+def process_student():
+    # 获取当前线程关联的student
+    std = local_school.student
+    print('Hello, %s (in %s)' % (std, threading.current_thread().name))
+
+
+def process_thread(name):
+    # 绑定ThreadLocal的student
+    local_school.student = name
+    process_student()
+
+
+t1 = threading.Thread(target=process_thread, args=('Alice',),
+                      name='Thread-A')
+t2 = threading.Thread(target=process_thread, args=('Bob',),
+                      name='Thread-B')
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+
+# 一个ThreadLocal变量虽然是全局变量，但每个线程都只能读写自己线程的独立副本，互不干扰。
+# ThreadLocal解决了参数在一个线程中各个函数之间互相传递的问题
+
+# 对于计算密集型任务，最好用C语言编写
+
+# 如果充分利用操作系统提供的异步IO支持，就可以用单进程单线程模型来执行多任务，
+# 这种全新的模型称为事件驱动模型
+
+# 对应到Python语言，单线程的异步编程模型称为协程，
+# 有了协程的支持，就可以基于事件驱动编写高效的多任务程序。我们会在后面讨论如何编写协程。
+
+# 分布式进程
+# 在Thread和Process中，应当优选Process，因为Process更稳定，
+# 而且，Process可以分布到多台机器上，而Thread最多只能分布到同一台机器的多个CPU上
+
+
+
+
+
 
 
 

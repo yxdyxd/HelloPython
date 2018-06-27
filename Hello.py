@@ -2869,8 +2869,6 @@
 #     pw.join()
 #     # pr进程里是死循环，无法等待其结束，只能强行终止
 #     pr.terminate()
-
-print('')
 # 多任务可以由多进程完成，也可以由一个进程内的多线程完成
 # Python的标准库提供了两个模块：_thread和threading，
 # _thread是低级模块，threading是高级模块，对_thread进行了封装。
@@ -2903,49 +2901,49 @@ print('')
 
 # 多线程之间最大的问题在于，多个线程同时操作一个变量，造成内容混乱
 # 当t1、t2交替执行时，只要循环次数足够多，balance的结果就不一定是0了
-import time, threading
+# import time, threading
 
-balance = 0
-
-
-def change_it(n):
-    # 先存后取，结果应该为0
-    global balance
-    balance = balance + n
-    balance = balance - n
+# balance = 0
 
 
-def run_thread(n):
-    for i in range(100000):
-        change_it(n)
-
-
-t1 = threading.Thread(target=run_thread, args=(5,))
-t2 = threading.Thread(target=run_thread, args=(5,))
-t1.start()
-t2.start()
-t1.join()
-t2.join()
-print('no lock %s' % balance)
+# def change_it(n):
+#     # 先存后取，结果应该为0
+#     global balance
+#     balance = balance + n
+#     balance = balance - n
+#
+#
+# def run_thread(n):
+#     for i in range(100000):
+#         change_it(n)
+#
+#
+# t1 = threading.Thread(target=run_thread, args=(5,))
+# t2 = threading.Thread(target=run_thread, args=(5,))
+# t1.start()
+# t2.start()
+# t1.join()
+# t2.join()
+# print('no lock %s' % balance)
 
 
 # 在一个线程修改balance时，别的线程不能对balance修改
 # 对线程进行加锁：同一时刻最多只有一个线程持有锁
 
-balance = 0
-lock = threading.Lock()
-
-
-def run_thread(n):
-    for i in range(100000):
-        # 先要获取锁
-        lock.acquire()
-        try:
-            # 修改
-            change_it(n)
-        finally:
-            # 修改完成之后，释放锁🔐
-            lock.release()
+# balance = 0
+# lock = threading.Lock()
+#
+#
+# def run_thread(n):
+#     for i in range(100000):
+#         # 先要获取锁
+#         lock.acquire()
+#         try:
+#             # 修改
+#             change_it(n)
+#         finally:
+#             # 修改完成之后，释放锁🔐
+#             lock.release()
 
 
 # 当多个线程同时执行lock.acquire()时，只有一个线程能成功的获取锁
@@ -2987,31 +2985,31 @@ def run_thread(n):
 # 创建全局Threading对象
 # ThreadLocal最常用的地方就是为每个线程绑定一个数据库连接，
 # HTTP请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
-import threading
-
-local_school = threading.local()
-
-
-def process_student():
-    # 获取当前线程关联的student
-    std = local_school.student
-    print('Hello, %s (in %s)' % (std, threading.current_thread().name))
-
-
-def process_thread(name):
-    # 绑定ThreadLocal的student
-    local_school.student = name
-    process_student()
-
-
-t1 = threading.Thread(target=process_thread, args=('Alice',),
-                      name='Thread-A')
-t2 = threading.Thread(target=process_thread, args=('Bob',),
-                      name='Thread-B')
-t1.start()
-t2.start()
-t1.join()
-t2.join()
+# import threading
+#
+# local_school = threading.local()
+#
+#
+# def process_student():
+#     # 获取当前线程关联的student
+#     std = local_school.student
+#     print('Hello, %s (in %s)' % (std, threading.current_thread().name))
+#
+#
+# def process_thread(name):
+#     # 绑定ThreadLocal的student
+#     local_school.student = name
+#     process_student()
+#
+#
+# t1 = threading.Thread(target=process_thread, args=('Alice',),
+#                       name='Thread-A')
+# t2 = threading.Thread(target=process_thread, args=('Bob',),
+#                       name='Thread-B')
+# t1.start()
+# t2.start()
+# t1.join()
+# t2.join()
 
 # 一个ThreadLocal变量虽然是全局变量，但每个线程都只能读写自己线程的独立副本，互不干扰。
 # ThreadLocal解决了参数在一个线程中各个函数之间互相传递的问题
@@ -3027,6 +3025,36 @@ t2.join()
 # 分布式进程
 # 在Thread和Process中，应当优选Process，因为Process更稳定，
 # 而且，Process可以分布到多台机器上，而Thread最多只能分布到同一台机器的多个CPU上
+
+# 如果我们已经有一个通过Queue通信的多进程程序在同一台机器上运行，
+# 现在，由于处理任务的进程任务繁重，希望把发送任务的进程和处理任务的进程分布到两台机器上。
+# 怎么用分布式进程实现？
+
+# 原有的Queue可以继续使用，但是，通过managers模块把Queue通过网络暴露出去，
+# 就可以让其他机器的进程访问Queue了。
+
+
+# 判断一个字符串是否是一个合法的Email
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -3059,10 +3059,41 @@ print('')
 
 
 # re模块
+import re
+
 print('ABC\-001')
 print(r'ABC\-001')
 
+# 切割字符串
+st = "a b   c".split(' ')
+print(st)
 
+st1 = re.split(r'\s+', 'a b   c')
+print(st1)
+
+# 分割空格加逗号
+st3 = re.split(r'[\s\,]+', 'a,b, c ,   d')
+print(st3)
+
+# 分割空格加逗号分号
+st4 = re.split(r'[\s\,\;]+', 'a, b;; c   , ;  d')
+print(st4)
+
+# 分组
+# 除了简单地判断是否匹配之外，正则表达式还有提取子串的强大功能。
+# 用()表示的就是要提取的分组（Group）
+# ^(\d{3})-(\d{3,8})$分别定义了两个组，可以直接从匹配的字符串中提取出区号和本地号码
+m = re.match(r'^(\d{3})-(\d{3,8})$', '010-12345')
+
+# 如果正则表达式中定义了组，就可以在Match对象上用group()方法提取出子串来
+# 注意到group(0)永远是原始字符串，group(1)、group(2)……表示第1、2、……个子串。
+print(m)
+print(m.group(0))
+print(m.group(1))
+
+
+tt = '19:05:30'
+m = re.match(r'^(0[0-9]|1[0-9]|2[0-3]|[0-9])')
 
 
 

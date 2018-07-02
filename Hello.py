@@ -3034,80 +3034,294 @@
 # 就可以让其他机器的进程访问Queue了。
 
 
-print('')
-# 判断一个字符串是否是一个合法的Email
-# 用\d可以匹配一个数字，\w可以匹配一个字母或数字
+# print('')
+# # 判断一个字符串是否是一个合法的Email
+# # 用\d可以匹配一个数字，\w可以匹配一个字母或数字
+#
+# # [0-9a-zA-Z\_]可以匹配一个数字、字母或者下划线；
+#
+# # [0-9a-zA-Z\_]+可以匹配至少由一个数字、字母或者下划线组成的字符串，
+# # 比如'a100'，'0_Z'，'Py3000'等等
+#
+# # [a-zA-Z\_][0-9a-zA-Z\_]*可以匹配由字母或下划线开头，
+# # 后接任意个由一个数字、字母或者下划线组成的字符串，也就是Python合法的变量
+#
+# # [a-zA-Z\_][0-9a-zA-Z\_]{0, 19}
+# # 更精确地限制了变量的长度是1-20个字符（前面1个字符+后面最多19个字符）
+#
+# # A|B可以匹配A或B，所以(P|p)ython可以匹配'Python'或者'python'
+#
+# # ^表示行的开头，^\d表示必须以数字开头
+#
+# # $表示行的结束，\d$表示必须以数字结束
+#
+# # py也可以匹配'python'，但是加上^py$就变成了整行匹配，就只能匹配'py'了
+#
+#
+# # re模块
+# import re
+#
+# print('ABC\-001')
+# print(r'ABC\-001')
+#
+# # 切割字符串
+# st = "a b   c".split(' ')
+# print(st)
+#
+# st1 = re.split(r'\s+', 'a b   c')
+# print(st1)
+#
+# # 分割空格加逗号
+# st3 = re.split(r'[\s\,]+', 'a,b, c ,   d')
+# print(st3)
+#
+# # 分割空格加逗号分号
+# st4 = re.split(r'[\s\,\;]+', 'a, b;; c   , ;  d')
+# print(st4)
+#
+# # 分组
+# # 除了简单地判断是否匹配之外，正则表达式还有提取子串的强大功能。
+# # 用()表示的就是要提取的分组（Group）
+# # ^(\d{3})-(\d{3,8})$分别定义了两个组，可以直接从匹配的字符串中提取出区号和本地号码
+# m = re.match(r'^(\d{3})-(\d{3,8})$', '010-12345')
+#
+# # 如果正则表达式中定义了组，就可以在Match对象上用group()方法提取出子串来
+# # 注意到group(0)永远是原始字符串，group(1)、group(2)……表示第1、2、……个子串。
+# print(m)
+# print(m.group(0))
+# print(m.group(1))
+#
+# # tt = '19:05:30'
+# # m = re.match(r'^(0[0-9]|1[0-9]|2[0-3]|[0-9])')
+#
+#
+# # 贪婪匹配
+# # 正则匹配默认是贪婪匹配，也就是匹配尽可能多的字符
+#
+# print(re.match(r'^(\d+)(0*)$', '102300').groups())
+# # 由于\d+采用贪婪匹配，直接把后面的0全部匹配了，结果0*只能匹配空字符串了
+# # 必须让\d+采用非贪婪匹配（也就是尽可能少匹配），才能把后面的0匹配出来，
+# # 加个?就可以让\d+采用非贪婪匹配
+# print(re.match(r'^(\d+?)(0*)$', '102300').groups())
+#
+# # 编译
+# # 当我们在Python中使用正则表达式时，re模块内部会干两件事情
+# # 1.编译正则表达式，如果正则表达式的字符串本身不合法，会报错；
+# # 2.用编译后的正则表达式去匹配字符串。
+# # 如果一个正则表达式要重复使用几千次，出于效率的考虑，
+# # 我们可以预编译该正则表达式，接下来重复使用时就不需要编译这个步骤了，直接匹配：
+# import re
+# # 编译
+# re_telephone = re.compile(r'^(\d{3})-(\d{3,8})$')
+# # 使用
+# print(re_telephone.match('010-12345').groups())
+# print(re_telephone.match('010-8086').groups())
+#
+#
+# # 验证是否为正确的邮箱
+# def is_valid_email(addresss):
+#     if re.match(r'^[a-z]+(.[a-z]+)*@[a-z]+(.[a-z]+)+$', addresss):
+#         return '匹配成功'
+#     else:
+#         return '匹配失败'
+#
+#
+# print(is_valid_email("someone@gmail.com"))
+# print(is_valid_email('bill.gates@microsoft.com'))
+# print(is_valid_email('bob#example.com'))
+# print(is_valid_email('mr-bob@example.com'))
 
-# [0-9a-zA-Z\_]可以匹配一个数字、字母或者下划线；
+# datetime
+# 获取当前日期和时间
+# 注意到datetime是模块，datetime模块还包含一个datetime类，
+# 通过from datetime import datetime导入的才是datetime这个类。
+# 如果仅导入import datetime，则必须引用全名datetime.datetime
+# datetime.now()返回当前日期和时间，其类型是datetime
+# from datetime import datetime
+# now = datetime.now()
+# print(now)
+# print(type(now))
 
-# [0-9a-zA-Z\_]+可以匹配至少由一个数字、字母或者下划线组成的字符串，
-# 比如'a100'，'0_Z'，'Py3000'等等
+# 获取指定日期和时间
+# dt = datetime(2015, 4, 19, 12, 20)
+# print(dt)
 
-# [a-zA-Z\_][0-9a-zA-Z\_]*可以匹配由字母或下划线开头，
-# 后接任意个由一个数字、字母或者下划线组成的字符串，也就是Python合法的变量
+# datetime转换为timestamp
+# 在计算机中，时间实际上是用数字表示的。
+# 我们把1970年1月1日 00:00:00 UTC+00:00时区的时刻称为epoch time，记为0
+# （1970年以前的时间timestamp为负数），当前时间就是相对于epoch time的秒数，
+# 称为timestamp。
+# 转换时间
 
-# [a-zA-Z\_][0-9a-zA-Z\_]{0, 19}
-# 更精确地限制了变量的长度是1-20个字符（前面1个字符+后面最多19个字符）
+from datetime import datetime, timedelta, timezone
+from collections import namedtuple, deque, defaultdict, OrderedDict, \
+    Counter
 
-# A|B可以匹配A或B，所以(P|p)ython可以匹配'Python'或者'python'
+dt = datetime(2018, 1, 1, 1, 1)
+# timestamp：在较低的Python版本中没有此方法
+# print(dt.timestamp())
+# 注意Python的timestamp是一个浮点数。如果有小数位，小数位表示毫秒数。
 
-# ^表示行的开头，^\d表示必须以数字开头
+# timestamp转换为datetime
+# 要把timestamp转换为datetime，使用datetime提供的fromtimestamp()方法：
+# from datetime import datetime
+# 注意到timestamp是一个浮点数，它没有时区的概念，而datetime是有时区的。
+# 上述转换是在timestamp和本地时间做转换
+t = 1429417200.0
+# print(datetime.fromtimestamp(t))
 
-# $表示行的结束，\d$表示必须以数字结束
+# timestamp也可以直接被转换到UTC标准时区的时间：
+t = 1429417200.0
+# 转化为本地时间
+# print(datetime.fromtimestamp(t))
+# 转化为UTC时间
+# print(datetime.utcfromtimestamp(t))
 
-# py也可以匹配'python'，但是加上^py$就变成了整行匹配，就只能匹配'py'了
+# str转化为datetime
+cady = datetime.strptime('2015-6-1 18:19:59', '%Y-%m-%d %H:%M:%S')
+# print(cady)
+
+# datetime转化为str
+now = datetime.now()
+# print(now.strftime('%a, %b %d %H:%M'))
+
+# datetime加减
+now = datetime.now()
+# print(now)
+# datetime.datetime(2018, 7, 2, 15, 36, 43)
+# print(now + timedelta(hours=10))
+# print(now - timedelta(days=1))
+i = 0
+while i < 10:
+    i = i + 1
+    # print(now - timedelta(weeks=i) - timedelta(days=i))
+# print(now - timedelta(weeks=1) - timedelta(days=1))
+
+# 本地时间转化为UTC时间
+# 创建时区UTC+8:00
+tz_utc_8 = timezone(timedelta(hours=8))
+now = datetime.now()
+# 强制设置为UTC+8:00
+dt = now.replace(tzinfo=tz_utc_8)
+print(dt)
+
+# 时区转换
+# 拿到UTC时间，并强制设置时区为UTC+8:00
+utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+print(utc_dt)
+# astimezone()将时区转化为北京时间
+bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8)))
+print(bj_dt)
+# 将时间转化为东京时间
+tokoy_dt = utc_dt.astimezone(timezone(timedelta(hours=9)))
+print(tokoy_dt)
+
+# collection:集合模块
+# namedtuple：定义一个坐标
+# 引入的表头在上边（使用哪个模块，一定要引入）
+Point = namedtuple('Point', ['x', 'y'])
+# namedtuple是一个函数，它用来创建一个自定义的tuple对象，并且规定了tuple元素的个数，
+# 并可以用属性而不是索引来引用tuple的某个元素。
+p = Point(1, 2)
+print('x: %s' % p.x)
+print('y: %s' % p.y)
+# 同样的namedtuple也可以定义三个元素
+Circle = namedtuple('Circle', ['x', 'y', 'r'])
+cir = Circle(1, 2, 3)
+
+# deque: 是为了高效实现插入和删除操作的双向列表，适合用于队列和栈
+q = deque(['a', 'b', 'c'])
+q.append('x')
+q.appendleft('y')
+print(q)
+
+# defaultdict: 使用dict时，如果引用的Key不存在，就会抛出KeyError。
+# 如果希望key不存在时，返回一个默认值，就可以用defaultdict
+# 注意默认值是调用函数返回的，而函数在创建defaultdict对象时传入。
+# 除了在Key不存在时返回默认值，defaultdict的其他行为跟dict是完全一样的
+dd = defaultdict(lambda: 'N/A')
+dd['key1'] = 'abc'
+print(dd['key1'])
+print(dd['key'])
+
+# OrderedDict：保持Key的顺序，可以用OrderedDict
+d = dict([('a', 1), ('c', 3), ('b', 2)])
+print(d)
+# 排序
+# 注意，OrderedDict的Key会按照插入的顺序排列，不是Key本身排序
+od = OrderedDict([('a', 1), ('c', 3), ('b', 2)])
+print(od)
 
 
-# re模块
-import re
+# OrderedDict可以实现一个FIFO（先进先出）的dict，当容量超出限制时，先删除最早添加的Key
+class LastUpdatedOrderedDict(OrderedDict):
 
-print('ABC\-001')
-print(r'ABC\-001')
+    def __init__(self, capacity):
+        super(LastUpdatedOrderedDict, self).__init__()
+        self._capacity = capacity
 
-# 切割字符串
-st = "a b   c".split(' ')
-print(st)
-
-st1 = re.split(r'\s+', 'a b   c')
-print(st1)
-
-# 分割空格加逗号
-st3 = re.split(r'[\s\,]+', 'a,b, c ,   d')
-print(st3)
-
-# 分割空格加逗号分号
-st4 = re.split(r'[\s\,\;]+', 'a, b;; c   , ;  d')
-print(st4)
-
-# 分组
-# 除了简单地判断是否匹配之外，正则表达式还有提取子串的强大功能。
-# 用()表示的就是要提取的分组（Group）
-# ^(\d{3})-(\d{3,8})$分别定义了两个组，可以直接从匹配的字符串中提取出区号和本地号码
-m = re.match(r'^(\d{3})-(\d{3,8})$', '010-12345')
-
-# 如果正则表达式中定义了组，就可以在Match对象上用group()方法提取出子串来
-# 注意到group(0)永远是原始字符串，group(1)、group(2)……表示第1、2、……个子串。
-print(m)
-print(m.group(0))
-print(m.group(1))
-
-# tt = '19:05:30'
-# m = re.match(r'^(0[0-9]|1[0-9]|2[0-3]|[0-9])')
+    def __setitem__(self, key, value):
+        containsKey = 1 if key in self else 0
+        if len(self) - containsKey >= self._capacity:
+            last = self.popitem(last=False)
+            print('remove:', last)
+        if containsKey:
+            del self[key]
+            print('set:', (key, value))
+        else:
+            print('add:', (key, value))
+        OrderedDict.__setitem__(self, key, value)
 
 
-# 贪婪匹配
-# 正则匹配默认是贪婪匹配，也就是匹配尽可能多的字符
+# counter: 简单的计数器
+# 统计字符出现的个数
+c = Counter()
+for ch in "programming":
+    c[ch] = c[ch] + 1
 
-print(re.match(r'^(\d+)(0*)$', '102300').groups())
-# 由于\d+采用贪婪匹配，直接把后面的0全部匹配了，结果0*只能匹配空字符串了
-# 必须让\d+采用非贪婪匹配（也就是尽可能少匹配），才能把后面的0匹配出来，
-# 加个?就可以让\d+采用非贪婪匹配
-print(re.match(r'^(\d+?)(0*)$', '102300').groups())
+print(c)
+
+# base64
+# Base64是一种用64个字符来表示任意二进制数据的方法。
+# Python内置的base64可以直接进行base64的编解码：
+import base64
+
+print(base64.b64encode(b'binary\x00string'))
+print(base64.b64decode(b'YmluYXJ5AHN0cmluZw=='))
+# 由于标准的Base64编码后可能出现字符+和/，在URL中就不能直接作为参数，
+# 所以又有一种"url safe"的base64编码，其实就是把字符+和/分别变成-和_：
+print(base64.b64encode(b'i\xb7\x1d\xfb\xef\xff'))
+print(base64.urlsafe_b64encode(b'i\xb7\x1d\xfb\xef\xff'))
+print(base64.urlsafe_b64decode(b'abcd--__'))
 
 
+# Base64是一种通过查表的编码方法，不能用于加密，即使使用自定义的编码表也不行
+# Base64适用于小段内容的编码，比如数字证书签名、Cookie的内容等
+# 由于=字符也可能出现在Base64编码中，但=用在URL、Cookie里面会造成歧义，
+# 所以，很多Base64编码后会把=去掉
+
+# 标准Base64:
+tt = base64.urlsafe_b64decode('YWJjZA==')
+print('22: %s' % tt)
+# 自动去掉=:
+print(base64.urlsafe_b64encode(b'abcd'))
+
+# Base64是一种任意二进制到文本字符串的编码方法，
+# 常用于在URL、Cookie、网页中传输少量二进制数据
+
+# 请写一个能处理去掉=的base64解码函数：
+def safe_base64_decode(s):
+    try:
+        isinstance(s, str)
+        if len(s) % 4:
+            s += b'=' * (4 - (len(s) % 4))
+        return base64.urlsafe_b64decode(s)
+    except Exception as e:
+        raise Exception
 
 
-
-
-
-
+assert b'abcd' == safe_base64_decode(b'YWJjZA=='), \
+    safe_base64_decode('YWJjZA==')
+assert b'abcd' == safe_base64_decode(b'YWJjZA'), \
+    safe_base64_decode('YWJjZA')
+print('ok')

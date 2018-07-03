@@ -3153,175 +3153,293 @@
 # 称为timestamp。
 # 转换时间
 
-from datetime import datetime, timedelta, timezone
-from collections import namedtuple, deque, defaultdict, OrderedDict, \
-    Counter
+# from datetime import datetime, timedelta, timezone
+# from collections import namedtuple, deque, defaultdict, OrderedDict, \
+#     Counter
+#
+# dt = datetime(2018, 1, 1, 1, 1)
+# # timestamp：在较低的Python版本中没有此方法
+# # print(dt.timestamp())
+# # 注意Python的timestamp是一个浮点数。如果有小数位，小数位表示毫秒数。
+#
+# # timestamp转换为datetime
+# # 要把timestamp转换为datetime，使用datetime提供的fromtimestamp()方法：
+# # from datetime import datetime
+# # 注意到timestamp是一个浮点数，它没有时区的概念，而datetime是有时区的。
+# # 上述转换是在timestamp和本地时间做转换
+# t = 1429417200.0
+# # print(datetime.fromtimestamp(t))
+#
+# # timestamp也可以直接被转换到UTC标准时区的时间：
+# t = 1429417200.0
+# # 转化为本地时间
+# # print(datetime.fromtimestamp(t))
+# # 转化为UTC时间
+# # print(datetime.utcfromtimestamp(t))
+#
+# # str转化为datetime
+# cady = datetime.strptime('2015-6-1 18:19:59', '%Y-%m-%d %H:%M:%S')
+# # print(cady)
+#
+# # datetime转化为str
+# now = datetime.now()
+# # print(now.strftime('%a, %b %d %H:%M'))
+#
+# # datetime加减
+# now = datetime.now()
+# # print(now)
+# # datetime.datetime(2018, 7, 2, 15, 36, 43)
+# # print(now + timedelta(hours=10))
+# # print(now - timedelta(days=1))
+# i = 0
+# while i < 10:
+#     i = i + 1
+#     # print(now - timedelta(weeks=i) - timedelta(days=i))
+# # print(now - timedelta(weeks=1) - timedelta(days=1))
+#
+# # 本地时间转化为UTC时间
+# # 创建时区UTC+8:00
+# tz_utc_8 = timezone(timedelta(hours=8))
+# now = datetime.now()
+# # 强制设置为UTC+8:00
+# dt = now.replace(tzinfo=tz_utc_8)
+# print(dt)
+#
+# # 时区转换
+# # 拿到UTC时间，并强制设置时区为UTC+8:00
+# utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+# print(utc_dt)
+# # astimezone()将时区转化为北京时间
+# bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8)))
+# print(bj_dt)
+# # 将时间转化为东京时间
+# tokoy_dt = utc_dt.astimezone(timezone(timedelta(hours=9)))
+# print(tokoy_dt)
+#
+# # collection:集合模块
+# # namedtuple：定义一个坐标
+# # 引入的表头在上边（使用哪个模块，一定要引入）
+# Point = namedtuple('Point', ['x', 'y'])
+# # namedtuple是一个函数，它用来创建一个自定义的tuple对象，并且规定了tuple元素的个数，
+# # 并可以用属性而不是索引来引用tuple的某个元素。
+# p = Point(1, 2)
+# print('x: %s' % p.x)
+# print('y: %s' % p.y)
+# # 同样的namedtuple也可以定义三个元素
+# Circle = namedtuple('Circle', ['x', 'y', 'r'])
+# cir = Circle(1, 2, 3)
+#
+# # deque: 是为了高效实现插入和删除操作的双向列表，适合用于队列和栈
+# q = deque(['a', 'b', 'c'])
+# q.append('x')
+# q.appendleft('y')
+# print(q)
+#
+# # defaultdict: 使用dict时，如果引用的Key不存在，就会抛出KeyError。
+# # 如果希望key不存在时，返回一个默认值，就可以用defaultdict
+# # 注意默认值是调用函数返回的，而函数在创建defaultdict对象时传入。
+# # 除了在Key不存在时返回默认值，defaultdict的其他行为跟dict是完全一样的
+# dd = defaultdict(lambda: 'N/A')
+# dd['key1'] = 'abc'
+# print(dd['key1'])
+# print(dd['key'])
+#
+# # OrderedDict：保持Key的顺序，可以用OrderedDict
+# d = dict([('a', 1), ('c', 3), ('b', 2)])
+# print(d)
+# # 排序
+# # 注意，OrderedDict的Key会按照插入的顺序排列，不是Key本身排序
+# od = OrderedDict([('a', 1), ('c', 3), ('b', 2)])
+# print(od)
+#
+#
+# # OrderedDict可以实现一个FIFO（先进先出）的dict，当容量超出限制时，先删除最早添加的Key
+# class LastUpdatedOrderedDict(OrderedDict):
+#
+#     def __init__(self, capacity):
+#         super(LastUpdatedOrderedDict, self).__init__()
+#         self._capacity = capacity
+#
+#     def __setitem__(self, key, value):
+#         containsKey = 1 if key in self else 0
+#         if len(self) - containsKey >= self._capacity:
+#             last = self.popitem(last=False)
+#             print('remove:', last)
+#         if containsKey:
+#             del self[key]
+#             print('set:', (key, value))
+#         else:
+#             print('add:', (key, value))
+#         OrderedDict.__setitem__(self, key, value)
+#
+#
+# # counter: 简单的计数器
+# # 统计字符出现的个数
+# c = Counter()
+# for ch in "programming":
+#     c[ch] = c[ch] + 1
+#
+# print(c)
+#
+# # base64
+# # Base64是一种用64个字符来表示任意二进制数据的方法。
+# # Python内置的base64可以直接进行base64的编解码：
+# import base64
+#
+# print(base64.b64encode(b'binary\x00string'))
+# print(base64.b64decode(b'YmluYXJ5AHN0cmluZw=='))
+# # 由于标准的Base64编码后可能出现字符+和/，在URL中就不能直接作为参数，
+# # 所以又有一种"url safe"的base64编码，其实就是把字符+和/分别变成-和_：
+# print(base64.b64encode(b'i\xb7\x1d\xfb\xef\xff'))
+# print(base64.urlsafe_b64encode(b'i\xb7\x1d\xfb\xef\xff'))
+# print(base64.urlsafe_b64decode(b'abcd--__'))
+#
+#
+# # Base64是一种通过查表的编码方法，不能用于加密，即使使用自定义的编码表也不行
+# # Base64适用于小段内容的编码，比如数字证书签名、Cookie的内容等
+# # 由于=字符也可能出现在Base64编码中，但=用在URL、Cookie里面会造成歧义，
+# # 所以，很多Base64编码后会把=去掉
+#
+# # 标准Base64:
+# tt = base64.urlsafe_b64decode('YWJjZA==')
+# print('22: %s' % tt)
+# # 自动去掉=:
+# print(base64.urlsafe_b64encode(b'abcd'))
+#
+# # Base64是一种任意二进制到文本字符串的编码方法，
+# # 常用于在URL、Cookie、网页中传输少量二进制数据
+#
+# # 请写一个能处理去掉=的base64解码函数：
+# def safe_base64_decode(s):
+#     try:
+#         isinstance(s, str)
+#         if len(s) % 4:
+#             s += b'=' * (4 - (len(s) % 4))
+#         return base64.urlsafe_b64decode(s)
+#     except Exception as e:
+#         raise Exception
+#
+#
+# assert b'abcd' == safe_base64_decode(b'YWJjZA=='), \
+#     safe_base64_decode('YWJjZA==')
+# assert b'abcd' == safe_base64_decode(b'YWJjZA'), \
+#     safe_base64_decode('YWJjZA')
+# print('ok')
 
-dt = datetime(2018, 1, 1, 1, 1)
-# timestamp：在较低的Python版本中没有此方法
-# print(dt.timestamp())
-# 注意Python的timestamp是一个浮点数。如果有小数位，小数位表示毫秒数。
 
-# timestamp转换为datetime
-# 要把timestamp转换为datetime，使用datetime提供的fromtimestamp()方法：
-# from datetime import datetime
-# 注意到timestamp是一个浮点数，它没有时区的概念，而datetime是有时区的。
-# 上述转换是在timestamp和本地时间做转换
-t = 1429417200.0
-# print(datetime.fromtimestamp(t))
+# struct: struct模块来解决bytes和其他二进制数据类型的转换。
+# import struct
+# >表示字节顺序是big-endian，也就是网络序，I表示4字节无符号整数
+# print(struct.pack('>I', 10240099))
 
-# timestamp也可以直接被转换到UTC标准时区的时间：
-t = 1429417200.0
-# 转化为本地时间
-# print(datetime.fromtimestamp(t))
-# 转化为UTC时间
-# print(datetime.utcfromtimestamp(t))
+# hashlib：摘要算法。摘要算法又称哈希算法、散列算法。
+# 它通过一个函数，把任意长度的数据转换为一个长度固定的数据串（通常用16进制的字符串表示）
+import hashlib, random
 
-# str转化为datetime
-cady = datetime.strptime('2015-6-1 18:19:59', '%Y-%m-%d %H:%M:%S')
-# print(cady)
+md5 = hashlib.md5()
+md5.update('how to use md5 in python hashlib?'.encode('utf-8'))
+# print(md5.hexdigest())
+# 如果数据量很大，可以分块多次调用update()，最后计算的结果是一样的：
+md5 = hashlib.md5()
+md5.update('how to use md5 in '.encode('utf-8'))
+md5.update('python hashlib?'.encode('utf-8'))
+# print(md5.hexdigest())
+# MD5是最常见的摘要算法，速度很快，生成结果是固定的128 bit字节，
+# 通常用一个32位的16进制字符串表示
 
-# datetime转化为str
-now = datetime.now()
-# print(now.strftime('%a, %b %d %H:%M'))
+# 另一种常见的摘要算法是SHA1，调用SHA1和调用MD5完全类似：
+# SHA1的结果是160 bit字节，通常用一个40位的16进制字符串表示
+sha1 = hashlib.sha1()
+sha1.update('how to use sha1 in '.encode('utf-8'))
+sha1.update('python hashlib?'.encode('utf-8'))
+# print(sha1.hexdigest())
 
-# datetime加减
-now = datetime.now()
-# print(now)
-# datetime.datetime(2018, 7, 2, 15, 36, 43)
-# print(now + timedelta(hours=10))
-# print(now - timedelta(days=1))
-i = 0
-while i < 10:
-    i = i + 1
-    # print(now - timedelta(weeks=i) - timedelta(days=i))
-# print(now - timedelta(weeks=1) - timedelta(days=1))
-
-# 本地时间转化为UTC时间
-# 创建时区UTC+8:00
-tz_utc_8 = timezone(timedelta(hours=8))
-now = datetime.now()
-# 强制设置为UTC+8:00
-dt = now.replace(tzinfo=tz_utc_8)
-print(dt)
-
-# 时区转换
-# 拿到UTC时间，并强制设置时区为UTC+8:00
-utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
-print(utc_dt)
-# astimezone()将时区转化为北京时间
-bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8)))
-print(bj_dt)
-# 将时间转化为东京时间
-tokoy_dt = utc_dt.astimezone(timezone(timedelta(hours=9)))
-print(tokoy_dt)
-
-# collection:集合模块
-# namedtuple：定义一个坐标
-# 引入的表头在上边（使用哪个模块，一定要引入）
-Point = namedtuple('Point', ['x', 'y'])
-# namedtuple是一个函数，它用来创建一个自定义的tuple对象，并且规定了tuple元素的个数，
-# 并可以用属性而不是索引来引用tuple的某个元素。
-p = Point(1, 2)
-print('x: %s' % p.x)
-print('y: %s' % p.y)
-# 同样的namedtuple也可以定义三个元素
-Circle = namedtuple('Circle', ['x', 'y', 'r'])
-cir = Circle(1, 2, 3)
-
-# deque: 是为了高效实现插入和删除操作的双向列表，适合用于队列和栈
-q = deque(['a', 'b', 'c'])
-q.append('x')
-q.appendleft('y')
-print(q)
-
-# defaultdict: 使用dict时，如果引用的Key不存在，就会抛出KeyError。
-# 如果希望key不存在时，返回一个默认值，就可以用defaultdict
-# 注意默认值是调用函数返回的，而函数在创建defaultdict对象时传入。
-# 除了在Key不存在时返回默认值，defaultdict的其他行为跟dict是完全一样的
-dd = defaultdict(lambda: 'N/A')
-dd['key1'] = 'abc'
-print(dd['key1'])
-print(dd['key'])
-
-# OrderedDict：保持Key的顺序，可以用OrderedDict
-d = dict([('a', 1), ('c', 3), ('b', 2)])
-print(d)
-# 排序
-# 注意，OrderedDict的Key会按照插入的顺序排列，不是Key本身排序
-od = OrderedDict([('a', 1), ('c', 3), ('b', 2)])
-print(od)
+# 比SHA1更安全的算法是SHA256和SHA512，不过越安全的算法不仅越慢，而且摘要长度更长
+# 由于常用口令的MD5值很容易被计算出来，
+# 所以，要确保存储的用户口令不是那些已经被计算出来的常用口令的MD5，
+# 这一方法通过对原始口令加一个复杂字符串来实现，俗称“加盐”
+# 经过Salt处理的MD5口令，只要Salt不被黑客知道，
+# 即使用户输入简单口令，也很难通过MD5反推明文口令
+# def calc_md5(password):
+#     return get_md5(password + 'the-Salt')
 
 
-# OrderedDict可以实现一个FIFO（先进先出）的dict，当容量超出限制时，先删除最早添加的Key
-class LastUpdatedOrderedDict(OrderedDict):
-
-    def __init__(self, capacity):
-        super(LastUpdatedOrderedDict, self).__init__()
-        self._capacity = capacity
-
-    def __setitem__(self, key, value):
-        containsKey = 1 if key in self else 0
-        if len(self) - containsKey >= self._capacity:
-            last = self.popitem(last=False)
-            print('remove:', last)
-        if containsKey:
-            del self[key]
-            print('set:', (key, value))
-        else:
-            print('add:', (key, value))
-        OrderedDict.__setitem__(self, key, value)
+# 获取加密的md5字串
+def get_md5(s):
+    return hashlib.md5(s.encode('utf-8')).hexdigest()
 
 
-# counter: 简单的计数器
-# 统计字符出现的个数
-c = Counter()
-for ch in "programming":
-    c[ch] = c[ch] + 1
-
-print(c)
-
-# base64
-# Base64是一种用64个字符来表示任意二进制数据的方法。
-# Python内置的base64可以直接进行base64的编解码：
-import base64
-
-print(base64.b64encode(b'binary\x00string'))
-print(base64.b64decode(b'YmluYXJ5AHN0cmluZw=='))
-# 由于标准的Base64编码后可能出现字符+和/，在URL中就不能直接作为参数，
-# 所以又有一种"url safe"的base64编码，其实就是把字符+和/分别变成-和_：
-print(base64.b64encode(b'i\xb7\x1d\xfb\xef\xff'))
-print(base64.urlsafe_b64encode(b'i\xb7\x1d\xfb\xef\xff'))
-print(base64.urlsafe_b64decode(b'abcd--__'))
+# 加密密码
+class User(object):
+    def __init__(self, username, password):
+        self.username = username
+        # 循环产生20个字符，加盐字串
+        self.salt = ''.join([chr(random.randint(48, 122))
+                             for i in range(20)])
+        self.password = get_md5(password + self.salt)
 
 
-# Base64是一种通过查表的编码方法，不能用于加密，即使使用自定义的编码表也不行
-# Base64适用于小段内容的编码，比如数字证书签名、Cookie的内容等
-# 由于=字符也可能出现在Base64编码中，但=用在URL、Cookie里面会造成歧义，
-# 所以，很多Base64编码后会把=去掉
-
-# 标准Base64:
-tt = base64.urlsafe_b64decode('YWJjZA==')
-print('22: %s' % tt)
-# 自动去掉=:
-print(base64.urlsafe_b64encode(b'abcd'))
-
-# Base64是一种任意二进制到文本字符串的编码方法，
-# 常用于在URL、Cookie、网页中传输少量二进制数据
-
-# 请写一个能处理去掉=的base64解码函数：
-def safe_base64_decode(s):
-    try:
-        isinstance(s, str)
-        if len(s) % 4:
-            s += b'=' * (4 - (len(s) % 4))
-        return base64.urlsafe_b64decode(s)
-    except Exception as e:
-        raise Exception
+db = {
+    'michael': User('michael', '123456'),
+    'bob': User('bob', 'abc999'),
+    'alice': User('alice', 'alice2008')
+}
 
 
-assert b'abcd' == safe_base64_decode(b'YWJjZA=='), \
-    safe_base64_decode('YWJjZA==')
-assert b'abcd' == safe_base64_decode(b'YWJjZA'), \
-    safe_base64_decode('YWJjZA')
+def login(username, password):
+    if username in db:
+        # b[username]：根据key值取到Value，字典中的Value是class，User创建的一个实例
+        # db[username].password：实例的属性包括，username、password和salt
+        return True if db[username].password == \
+                       get_md5(password + db[username].salt) else False
+    else:
+        return False
+
+
+# 测试:
+assert login('michael', '123456')
+assert login('bob', 'abc999')
+assert login('alice', 'alice2008')
+assert not login('michael', '1234567')
+assert not login('bob', '123456')
+assert not login('alice', 'Alice2008')
 print('ok')
+
+
+# Hmac算法：Keyed-Hashing for Message Authentication。
+# 和我们自定义的加salt算法不同，Hmac算法针对所有哈希算法都通用，
+# 无论是MD5还是SHA-1。采用Hmac替代我们自己的salt算法，可以使程序算法更标准化，也更安全。
+# 它通过一个标准算法，在计算哈希的过程中，把key混入计算过程中。
+# 我们首先需要准备待计算的原始消息message，随机key，哈希算法，
+# 这里采用MD5，使用hmac的代码如下
+import hmac, random
+message = b'Hello, world!'
+key = b'secret'
+h = hmac.new(key, message, digestmod='MD5')
+print(h.hexdigest())
+
+
+def hmac_md5(key, s):
+    return hmac.new(key.encode('utf-8'),
+                    s.encode('utf-8'), 'MD5').hexdigest()
+
+
+class User(object):
+    def __init__(self, username, password):
+        self.username = username
+        self.key = ''.join([chr(random.randint(48, 122))
+                            for i in range(20)])
+        self.password = hmac_md5(self.key, password)
+
+db = {
+    'michael': User('michael', '123456'),
+    'bob': User('bob', 'abc999'),
+    'alice': User('alice', 'alice2008')
+}
+
+
+
+
+
+
+

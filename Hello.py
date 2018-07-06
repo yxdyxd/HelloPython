@@ -3582,12 +3582,12 @@
 
 # post请求
 # 如果要以POST发送一个请求，只需要把参数data以bytes形式传入
-import json
-import urllib
-from urllib import request, parse
-import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
+# import json
+# import urllib
+# from urllib import request, parse
+# import ssl
+#
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 
 # print('Login to weibo.cn...')
@@ -3636,19 +3636,19 @@ ssl._create_default_https_context = ssl._create_unverified_context
 # 伪装的方法是先监控浏览器发出的请求，再根据浏览器的请求头来伪装，
 # User-Agent头就是用来标识浏览器的。
 
-def fetch_data(url):
-    with request.urlopen(url) as f:
-        js = json.load(f)
-        return js
-
-
-URL = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20' \
-      'from%20weather.forecast%20where%20woeid%20%3D%202151330' \
-      '&format=json'
-data = fetch_data(URL)
-print(data)
-assert data['query']['results']['channel']['location']['city'] == 'Beijing'
-print('ok')
+# def fetch_data(url):
+#     with request.urlopen(url) as f:
+#         js = json.load(f)
+#         return js
+#
+#
+# URL = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20' \
+#       'from%20weather.forecast%20where%20woeid%20%3D%202151330' \
+#       '&format=json'
+# data = fetch_data(URL)
+# print(data)
+# assert data['query']['results']['channel']['location']['city'] == 'Beijing'
+# print('ok')
 
 # XML
 # 操作XML有两种方法：
@@ -3664,37 +3664,204 @@ print('ok')
 # char_data事件，在读取python时；
 # end_element事件，在读取</a>时。
 
-from xml.parsers.expat import ParserCreate
-
-
-class DefaultSaxHandler(object):
-
-    def start_element(self, name, attrs):
-        print('sax:start_element: %s, attrs: %s' % (name, str(attrs)))
-
-    def end_element(self, name):
-        print('sax:end_element: %s' % name)
-
-    def char_data(self, text):
-        print('sax:char_data: %s' % text)
-
-xml = xml = r'''<?xml version="1.0"?>
-<ol>
-    <li><a href="/python">Python</a></li>
-    <li><a href="/ruby">Ruby</a></li>
-</ol>
-'''
+# from xml.parsers.expat import ParserCreate
+#
+#
+# class DefaultSaxHandler(object):
+#
+#     def start_element(self, name, attrs):
+#         print('sax:start_element: %s, attrs: %s' % (name, str(attrs)))
+#
+#     def end_element(self, name):
+#         print('sax:end_element: %s' % name)
+#
+#     def char_data(self, text):
+#         print('sax:char_data: %s' % text)
+#
+# xml = xml = r'''<?xml version="1.0"?>
+# <ol>
+#     <li><a href="/python">Python</a></li>
+#     <li><a href="/ruby">Ruby</a></li>
+# </ol>
+# '''
 
 # 需要注意的是读取一大段字符串时，CharacterDataHandler可能被多次调用，
 # 所以需要自己保存起来，在EndElementHandler里面再合并
-handler = DefaultSaxHandler()
-parser = ParserCreate()
-parser.StartElementHandler = handler.start_element
-parser.EndElementHandler = handler.end_element
-parser.CharacterDataHandler = handler.char_data
-parser.Parse(xml)
+# handler = DefaultSaxHandler()
+# parser = ParserCreate()
+# parser.StartElementHandler = handler.start_element
+# parser.EndElementHandler = handler.end_element
+# parser.CharacterDataHandler = handler.char_data
+# parser.Parse(xml)
+
+# import json
+# import urllib
+# from urllib import request, parse
+# from html.parser import HTMLParser
+# from html.entities import name2codepoint
+# import ssl
+#
+# ssl._create_default_https_context = ssl._create_unverified_context
+#
+# class MyHTMLParser(HTMLParser):
+#
+#     def handle_starttag(self, tag, attrs):
+#         print('<%s>' % tag)
+#
+#     def handle_endtag(self, tag):
+#         print('<%s>' % tag)
+#
+#     def handle_startendtag(self, tag, attrs):
+#         print('<%s>' % tag)
+#
+#     def handle_data(self, data):
+#         print(data)
+#
+#     def handle_comment(self, data):
+#         print('<!--', data, '-->')
+#
+#     def handle_entityref(self, name):
+#         print('&%s;' % name)
+#
+#     def handle_charref(self, name):
+#         print('&#%s;' % name)
+#
+#
+# parser = MyHTMLParser()
+# parser.feed('''<html>
+# <head></head>
+# <body>
+# <!-- test html parser -->
+#     <p>Some <a href=\"#\">html</a> HTML&nbsp;tutorial...<br>END</p>
+# # </body></html>''')
+#
+# # feed()方法可以多次调用，不一定一次把整个HTML字符串都塞进去，可以一部分一部分塞进去。
+# # 特殊字符有两种，一种是英文表示的&nbsp;，一种是数字表示的&#1234;，
+# # 这两种字符都可以通过Parser解析出来。
+#
+# from html.parser import HTMLParser
+# from html.entities import name2codepoint
+# from urllib import request
+# import re
+#
+#
+# class MyHTMLParser(HTMLParser):
+#     a_t1 = False
+#     a_t2 = False
+#     a_t3 = False
+#
+#     def __init__(self):
+#         HTMLParser.__init__(self)
+#         self.information = []
+#         self.information_all = {}
+#
+#     def handle_starttag(self, tag, attrs):
+#         def _attr(attrlist, attrname):
+#             for attr in attrlist:
+#                 if attr[0] == attrname:
+#                     return attr[1]
+#             return None
+#
+#         if tag == "time":
+#             self.a_t1 = True
+#         # and的用法：
+#         # 如果布尔上下文中的所有值都为真，那么 and 返回最后一个值。
+#         # 如果布尔上下文中的某个值为假，则 and 返回第一个假值。
+#         elif tag == "span" and _attr(attrs, 'class') == "event-location":
+#             self.a_t2 = True
+#         elif tag == "h3" and _attr(attrs, 'class') == "event-title":
+#             self.a_t3 = True
+#
+#     def handle_data(self, data):
+#         if self.a_t1 is True:
+#             if re.match(r'^\s\d{4}', data):
+#                 self.information.append(dict(year=data))
+#             else:
+#                 self.information.append(dict(day=data))
+#         elif self.a_t2 is True:
+#             self.information.append(dict(event_location=data))
+#         elif self.a_t3 is True:
+#             self.information.append(dict(event_title=data))
+#
+#     def handle_endtag(self, tag):
+#         if tag == "time":
+#             self.a_t1 = False
+#         elif tag == "span":
+#             self.a_t2 = False
+#         elif tag == "h3":
+#             self.a_t3 = False
+#
+#
+# def parseHTML(html_str):
+#     parser = MyHTMLParser()
+#     parser.feed(html_str)
+#     for i, val in enumerate(parser.information):
+#         i += 1
+#         print(val)
+#         if i % 4 == 0:
+#             print('--------------------------------------------')
+#
+#
+# URL = 'https://www.python.org/events/python-events/'
+# with request.urlopen(URL, timeout=4) as f:
+#     data = f.read()
+#
+# parseHTML(data.decode('utf-8'))
 
 
+from PIL import Image, ImageFilter, ImageDraw, ImageFont
+
+im = Image.open('/Users/yangxudong/Desktop/2.jpeg')
+w, h = im.size
+print('Original image size: %sx%s' % (w, h))
+# 缩放到50%
+im.thumbnail((w//2, h//2))
+print('Resize image to: %sx%s' % (w//2, h//2))
+# 把缩放后的图像用jpeg格式保存
+im.save('thumbnail.jpg', 'jpeg')
+im = Image.open('/Users/yangxudong/Desktop/2.jpeg')
+# 应用模糊滤镜
+im2 = im.filter(ImageFilter.BLUR)
+im2.save('blur.jpg', 'jpeg')
+
+
+# 生成字母验证图片
+import random
+
+# 随机字母
+def rndChar():
+    return chr(random.randint(65, 90))
+
+# 颜色随机1：
+def rndColor():
+    return (random.randint(64, 255), random.randint(64, 255),
+            random.randint(64, 255))
+
+# 随机颜色2
+def rndColor2():
+    return (random.randint(32, 127), random.randint(32, 127),
+            random.randint(32, 127))
+
+# 240x60
+width = 60*4
+height = 60
+image = Image.new('RGB', (width, height), (255, 255, 255))
+# 创建font对象
+font = ImageFont.truetype('Arial.ttf', 36)
+# 创建Draw对象
+draw = ImageDraw.Draw(image)
+# 填充每个像素
+for x in range(width):
+    for y in range(height):
+        draw.point((x, y), fill=rndColor())
+# 输出文字
+for t in range(4):
+    draw.text((60*t+10, 10), rndChar(), font=font, fill=rndColor2())
+# 模糊
+image = image.filter(ImageFilter.BLUR)
+image.save('code.jpg', 'jpeg')
+
+import requests
 
 
 

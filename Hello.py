@@ -3809,61 +3809,137 @@
 # parseHTML(data.decode('utf-8'))
 
 
-from PIL import Image, ImageFilter, ImageDraw, ImageFont
+# from PIL import Image, ImageFilter, ImageDraw, ImageFont
+#
+# im = Image.open('/Users/yangxudong/Desktop/2.jpeg')
+# w, h = im.size
+# print('Original image size: %sx%s' % (w, h))
+# # 缩放到50%
+# im.thumbnail((w//2, h//2))
+# print('Resize image to: %sx%s' % (w//2, h//2))
+# # 把缩放后的图像用jpeg格式保存
+# im.save('thumbnail.jpg', 'jpeg')
+# im = Image.open('/Users/yangxudong/Desktop/2.jpeg')
+# # 应用模糊滤镜
+# im2 = im.filter(ImageFilter.BLUR)
+# im2.save('blur.jpg', 'jpeg')
+#
+#
+# # 生成字母验证图片
+# import random
+#
+# # 随机字母
+# def rndChar():
+#     return chr(random.randint(65, 90))
+#
+# # 颜色随机1：
+# def rndColor():
+#     return (random.randint(64, 255), random.randint(64, 255),
+#             random.randint(64, 255))
+#
+# # 随机颜色2
+# def rndColor2():
+#     return (random.randint(32, 127), random.randint(32, 127),
+#             random.randint(32, 127))
+#
+# # 240x60
+# width = 60*4
+# height = 60
+# image = Image.new('RGB', (width, height), (255, 255, 255))
+# # 创建font对象
+# font = ImageFont.truetype('Arial.ttf', 36)
+# # 创建Draw对象
+# draw = ImageDraw.Draw(image)
+# # 填充每个像素
+# for x in range(width):
+#     for y in range(height):
+#         draw.point((x, y), fill=rndColor())
+# # 输出文字
+# for t in range(4):
+#     draw.text((60*t+10, 10), rndChar(), font=font, fill=rndColor2())
+# # 模糊
+# image = image.filter(ImageFilter.BLUR)
+# image.save('code.jpg', 'jpeg')
 
-im = Image.open('/Users/yangxudong/Desktop/2.jpeg')
-w, h = im.size
-print('Original image size: %sx%s' % (w, h))
-# 缩放到50%
-im.thumbnail((w//2, h//2))
-print('Resize image to: %sx%s' % (w//2, h//2))
-# 把缩放后的图像用jpeg格式保存
-im.save('thumbnail.jpg', 'jpeg')
-im = Image.open('/Users/yangxudong/Desktop/2.jpeg')
-# 应用模糊滤镜
-im2 = im.filter(ImageFilter.BLUR)
-im2.save('blur.jpg', 'jpeg')
+# import requests
+#
+# # request：POST和get请求，明文和传参。具体情况，具体对待
+#
+# # 传入cookies参数
+# cs = {'token': '12345', 'status': 'working'}
+# r = requests.get(url, cookies= cs)
+#
+# # 指定超时时间
+# r = requests.get(url='', timeout=2.5)
+
+# import chardet
+# # chardet:检查字符串的编码格式
+# # 检测出的编码是ascii，注意到还有个confidence字段，表示检测的概率是1.0（即100%）
+# print(chardet.detect(b'Hello, world!'))
+#
+# # 我们来试试检测GBK编码的中文：
+# data = '离离原上草，一岁一枯荣'.encode('gbk')
+# print(chardet.detect(data))
+#
+# # 对UTF-8编码进行检测：
+# data = '离离原上草，一岁一枯荣'.encode('utf-8')
+# print(chardet.detect(data))
+#
+# # 对日文进行检测：
+# data = '最新の主要ニュース'.encode('euc-jp')
+# print(chardet.detect(data))
+
+# 可见，用chardet检测编码，使用简单。获取到编码后，再转换为str，就可以方便后续处理。
 
 
-# 生成字母验证图片
-import random
+import psutil
+# 在Python中获取系统信息的另一个好办法是使用psutil这个第三方模块
 
-# 随机字母
-def rndChar():
-    return chr(random.randint(65, 90))
+# 获取CPU信息
+print(psutil.cpu_count())
+# cpu的物理核心
+print(psutil.cpu_count(logical=False))
+# 捅进CPU的用户/系统/空闲时间
+print(psutil.cpu_times())
+# 实现类似top命令的CPU使用率，每秒刷新一次。累计10次
+# for x in range(10):
+#     print(psutil.cpu_percent(interval=1, percpu=True))
+# 获取内存信息
+# 使用psutil获取物理内存和交换内存信息，分别使用：
+# 返回的是字节为单位的整数，可以看到，总内存大小是8589934592 = 8 GB，
+# 已用7201386496 = 6.7 GB，使用了66.6%
+# print(psutil.virtual_memory())
+# print(psutil.swap_memory())
 
-# 颜色随机1：
-def rndColor():
-    return (random.randint(64, 255), random.randint(64, 255),
-            random.randint(64, 255))
+# 获取磁盘信息
+# 可以通过psutil获取磁盘分区、磁盘使用率和磁盘IO信息：
+# 磁盘的分区信息
+# print(psutil.disk_partitions())
+# 磁盘使用情况
+# print(psutil.disk_usage('/'))
+# 磁盘IO
+# print(psutil.disk_io_counters())
 
-# 随机颜色2
-def rndColor2():
-    return (random.randint(32, 127), random.randint(32, 127),
-            random.randint(32, 127))
+# 获取网络信息：获取网络的接口和网络连接信息
+# 获取网络读写字节/包的个数
+# print(psutil.net_io_counters())
+# 获取网络接口信息
+print(psutil.net_if_addrs())
+# 获取网络接口状态
+print(psutil.net_if_stats())
+# 获取当前网络连接信息，使用net_connections()
+# 你可能会得到一个AccessDenied错误，原因是psutil获取信息也是要走系统接口，
+# 而获取网络连接信息需要root权限，这种情况下，可以退出Python交互环境，用sudo重新启动
+# print(psutil.net_connections())
 
-# 240x60
-width = 60*4
-height = 60
-image = Image.new('RGB', (width, height), (255, 255, 255))
-# 创建font对象
-font = ImageFont.truetype('Arial.ttf', 36)
-# 创建Draw对象
-draw = ImageDraw.Draw(image)
-# 填充每个像素
-for x in range(width):
-    for y in range(height):
-        draw.point((x, y), fill=rndColor())
-# 输出文字
-for t in range(4):
-    draw.text((60*t+10, 10), rndChar(), font=font, fill=rndColor2())
-# 模糊
-image = image.filter(ImageFilter.BLUR)
-image.save('code.jpg', 'jpeg')
-
-import requests
-
-
+# 获取进程信息
+# 所有进程ID
+# print(psutil.pids())
+# 获取指定进程ID=3776，其实就是当前Python交互环境
+# p = psutil.Process(3341)
+# print(p.name())
+# 和获取网络连接类似，获取一个root用户的进程需要root权限，
+# 启动Python交互环境或者.py文件时，需要sudo权限。
 
 
 

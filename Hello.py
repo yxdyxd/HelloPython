@@ -3892,15 +3892,15 @@
 # 可见，用chardet检测编码，使用简单。获取到编码后，再转换为str，就可以方便后续处理。
 
 
-import psutil
+# import psutil
 # 在Python中获取系统信息的另一个好办法是使用psutil这个第三方模块
 
 # 获取CPU信息
-print(psutil.cpu_count())
+# print(psutil.cpu_count())
 # cpu的物理核心
-print(psutil.cpu_count(logical=False))
+# print(psutil.cpu_count(logical=False))
 # 捅进CPU的用户/系统/空闲时间
-print(psutil.cpu_times())
+# print(psutil.cpu_times())
 # 实现类似top命令的CPU使用率，每秒刷新一次。累计10次
 # for x in range(10):
 #     print(psutil.cpu_percent(interval=1, percpu=True))
@@ -3924,9 +3924,9 @@ print(psutil.cpu_times())
 # 获取网络读写字节/包的个数
 # print(psutil.net_io_counters())
 # 获取网络接口信息
-print(psutil.net_if_addrs())
+# print(psutil.net_if_addrs())
 # 获取网络接口状态
-print(psutil.net_if_stats())
+# print(psutil.net_if_stats())
 # 获取当前网络连接信息，使用net_connections()
 # 你可能会得到一个AccessDenied错误，原因是psutil获取信息也是要走系统接口，
 # 而获取网络连接信息需要root权限，这种情况下，可以退出Python交互环境，用sudo重新启动
@@ -3940,6 +3940,153 @@ print(psutil.net_if_stats())
 # print(p.name())
 # 和获取网络连接类似，获取一个root用户的进程需要root权限，
 # 启动Python交互环境或者.py文件时，需要sudo权限。
+
+# virtualenv:
+# 创建一套独立的Python运行环境
+
+# 图形界面
+# 我们编写的Python代码会调用内置的Tkinter，Tkinter封装了访问Tk的接口；
+# Tk是一个图形库，支持多个操作系统，使用Tcl语言开发；
+# Tk会调用操作系统提供的本地GUI接口，完成最终的GUI。
+# 所以，我们的代码只需要调用Tkinter提供的接口就可以了。
+
+# 第一个GUI程序
+# from tkinter import *
+#
+#
+# class Application(Frame):
+#
+#     def __init__(self, master=None):
+#         Frame.__init__(self, master)
+#         self.quitButton = Button(self, text='Quit', command=self.quit)
+#         self.helloLabel = Label(self, text='Hello world')
+#         self.pack()
+#         self.createWidgets()
+#
+#     def createWidgets(self):
+#         self.helloLabel.pack()
+#         self.quitButton.pack()
+#
+#
+# # 实例化Application，并启动消息循环
+# # app = Application()
+# # 设置窗口标题：
+# # app.master.title('Hello World')
+# # 主消息循环：
+# # app.mainloop()
+#
+#
+# # 输入文本
+# import tkinter.messagebox as messagebox
+#
+#
+# class Application(Frame):
+#
+#     def __init__(self, master=None):
+#         Frame.__init__(self, master)
+#         self.alertButton = Button(self, text='Hello', command=self.hello)
+#         self.nameInput = Entry(self)
+#         self.pack()
+#         self.createWidgets()
+#
+#     def createWidgets(self):
+#         self.nameInput.pack()
+#         self.alertButton.pack()
+#
+#     def hello(self):
+#         name = self.nameInput.get() or 'world'
+#         messagebox.showinfo('Message', 'Hello, %s' % name)
+#
+#
+# app = Application()
+# app.master.title('Hello World')
+# app.mainloop()
+
+
+# TCP编程
+# 创建一个基于TCP连接的Socket
+import socket, threading, time
+
+# 创建一个socket
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 建立连接
+# s.connect(('www.sina.com.cn', 80))
+# 建立TCP连接后，我们就可以向新浪服务器发送请求，要求返回首页的内容：
+# s.send(b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection:'
+#        b' close\r\n\r\n')
+# 接受数据
+# 接收数据时，调用recv(max)方法，一次最多接收指定的字节数，
+# 因此，在一个while循环中反复接收，直到recv()返回空数据，表示接收完毕，退出循环。
+# buffer = []
+# while True:
+#     # 每次最多接受1k字节
+#     d = s.recv(1024)
+#     if d:
+#         buffer.append(d)
+#     else:
+#         break
+# data = b''.join(buffer)
+# print(data)
+
+# 当我们接收完数据后，调用close()方法关闭Socket，这样，一次完整的网络通信就结束了
+# s.close()
+
+# 接收到的数据包括HTTP头和网页本身，我们只需要把HTTP头和网页分离一下，
+# 把HTTP头打印出来，网页内容保存到文件
+# 现在，只需要在浏览器中打开这个sina.html文件，就可以看到新浪的首页了
+# header, html = data.split(b'\r\n\r\n', 1)
+# print(header.decode('utf-8'))
+# 把接受数据写入文件
+# with open('sina.html', 'wb') as f:
+#     f.write(html)
+
+
+
+# 服务器
+# 服务器进程首先要绑定一个端口并监听来自其他客户端的连接。
+# 如果某个客户端连接过来了，服务器就与该客户端建立Socket连接，
+# 随后的通信就靠这个Socket连接了
+
+# 一个Socket依赖4项：服务器地址、服务器端口、客户端地址、客户端端口来唯一确定一个Socket。
+# 编写一个简单的服务器程序，它接收客户端连接，把客户端发过来的字符串加上Hello再发回去
+# 首先，创建一个基于IPv4和TCP协议的Socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 端口号需要预先指定。因为我们写的这个服务不是标准服务，所以用9999这个端口号。
+# 请注意，小于1024的端口号必须要有管理员权限才能绑定：
+
+# 监听端口号
+# 127.0.0.1是一个特殊的IP地址，表示本机地址，如果绑定到这个地址，
+# 客户端必须同时在本机运行才能连接，也就是说，外部的计算机无法连接进来。
+s.bind(('127.0.0.1', 9999))
+# 紧接着，调用listen()方法开始监听端口，传入的参数指定等待连接的最大数量：
+s.listen(5)
+print('Waiting for connection...')
+# 接下来，服务器程序通过一个永久循环来接受来自客户端的连接，
+# accept()会等待并返回一个客户端的连接:
+while True:
+    # 接受一个新的连接
+    sock, addr = s.accept()
+    # 创建新线程来处理TCP连接
+    t = threading.Thread(target=tcplink, args=(sock, addr))
+    t.start()
+
+
+# 每个连接都必须创建新线程（或进程）来处理，
+# 否则，单线程在处理连接的过程中，无法接受其他客户端的连接：
+    def tcplink(sock, addr):
+        print('Accept new connection from %s:%s...' % addr)
+        sock.send(b'Welcome')
+        while True:
+            data = sock.recv(1024)
+            time.sleep(1)
+            if not data or data.decode('utf-8') == 'exit':
+                break
+            sock.send(('Hello, %s' % data.decode('utf-8')).encode('utf-8'))
+        sock.close()
+        print('Connection from %s:%s closed.' % addr)
+
+# 连接建立后，服务器首先发一条欢迎消息，然后等待客户端数据，
+# 并加上Hello再发送给客户端。如果客户端发送了exit字符串，就直接关闭连接。
 
 
 

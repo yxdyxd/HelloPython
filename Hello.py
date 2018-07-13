@@ -4150,8 +4150,9 @@
 # server.quit()
 
 # 把From、To和Subject添加到MIMEText中，才是一封完整的邮件：
+import poplib
 from email import encoders
-from email.header import Header
+from email.header import Header, decode_header
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -4161,238 +4162,131 @@ from email.utils import parseaddr, formataddr
 import smtplib
 
 
-# def _format_addr(s):
-#     name, addr = parseaddr(s)
-#     return formataddr((Header(name, 'utf-8').encode(), addr))
-#
-#
-# from_addr = input('From: ')  # 240933281@qq.com
-# password = input('Password: ')  # znpvwlpgmjzjbjgf
-# to_addr = input('To: ')  # 2766152135@qq.com
-# smtp_server = input('SMTP server: ')  # smtp.qq.com
-#
-# # 发送文字
-# # msg = MIMEText('hello, send by Python...', 'plain', 'utf-8')
-#
-#
-# # 发送HTML邮件
-# # 如果我们要发送HTML邮件，而不是普通的纯文本文件怎么办？方法很简单，
-# # 在构造MIMEText对象时，把HTML字符串传进去，再把第二个参数由plain变为html就可以了
-# # msg = MIMEText('<html><body><h1>Hello</h1>' +
-# #     '<p>send by <a href="http://www.python.org">Python</a>...</p>' +
-# #     '</body></html>', 'html', 'utf-8')
-# # msg['From'] = _format_addr('Python爱好者 <%s>' % from_addr)
-# # msg['To'] = _format_addr('管理员 <%s>' % to_addr)
-# # msg['Subject'] = Header('来自SMTP的问候……', 'utf-8').encode()
-#
-#
-# # 发送附件
-# # 构造一个MIMEMultipart对象代表邮件本身，然后往里面加上一个MIMEText作为邮件正文，
-# # 再继续往里面加上表示附件的MIMEBase对象即可
-# # 邮件对象
-# # msg = MIMEMultipart()
-# # msg['from'] = _format_addr('Python爱好者<%s>' % from_addr)
-# # msg['To'] = _format_addr('管理员<%s>' % to_addr)
-# # msg['Subject'] = Header('来自SMTP的问候.....', 'utf-8').encode()
-# # # 邮件正文是MIMEText
-# # msg.attach(MIMEText('send with file...', 'plain', 'utf-8'))
-# # # 添加附件就是加上一个MIMEBase，从本地读取一个图片
-# # with open('/Users/yangxudong/Desktop/HelloPython/thumbnail.jpg',
-# #           'rb') as f:
-# #     # 设置附件的MIME和文件名，这里是jpg类型
-# #     mime = MIMEBase('image', 'jpg', filename='thumbnail.jpg')
-# #     # 加上必要的头信息
-# #     mime.add_header('Content-Disposition', 'attachment',
-# #                     filename='thumbnail.jpg')
-# #     mime.add_header('Content-ID', '<0>')
-# #     mime.add_header('X-Attachment-Id', '0')
-# #     # 把附件的内容读进来
-# #     mime.set_payload(f.read())
-# #     # 用Base64编码
-# #     encoders.encode_base64(mime)
-# #     # 添加到MIMultipart
-# #     msg.attach(mime)
-#
-#
-# # 发送图片，把一个图片嵌入到正文中
-# # 把图片嵌入到邮件正文中，我们只需按照发送附件的方式，先把邮件作为附件添加进去，
-# # 然后，在HTML中通过引用src="cid:0"就可以把附件作为图片嵌入了。
-# # 如果有多个图片，给它们依次编号，然后引用不同的cid:x即可
-# # msg = MIMEMultipart()
-# # msg['from'] = _format_addr('Python爱好者<%s>' % from_addr)
-# # msg['To'] = _format_addr('管理员<%s>' % to_addr)
-# # msg['Subject'] = Header('来自SMTP的问候.....', 'utf-8').encode()
-# # # 邮件正文是MIMEText
-# # msg.attach(MIMEText('<html><body><h1>Hello</h1>' +
-# #     '<p><img src="cid:0"></p>' +
-# #     '</body></html>', 'html', 'utf-8'))
-# # # 添加附件就是加上一个MIMEBase，从本地读取一个图片
-# # with open('/Users/yangxudong/Desktop/HelloPython/thumbnail.jpg',
-# #           'rb') as f:
-# #     # 设置附件的MIME和文件名，这里是jpg类型
-# #     mime = MIMEBase('image', 'jpg', filename='thumbnail.jpg')
-# #     # 加上必要的头信息
-# #     mime.add_header('Content-Disposition', 'attachment',
-# #                     filename='thumbnail.jpg')
-# #     mime.add_header('Content-ID', '<0>')
-# #     mime.add_header('X-Attachment-Id', '0')
-# #     # 把附件的内容读进来
-# #     mime.set_payload(f.read())
-# #     # 用Base64编码
-# #     encoders.encode_base64(mime)
-# #     # 添加到MIMultipart
-# #     msg.attach(mime)
-#
-#
-# # 同时支持HTML和Plain格式
-# # 如果收件人使用的设备太古老，查看不了HTML邮件。
-# # 在发送HTML的同时再附加一个纯文本，如果收件人无法查看HTML格式的邮件，
-# # 就可以自动降级查看纯文本邮件
-# # 利用MIMEMultipart就可以组合一个HTML和Plain，要注意指定subtype是alternative
-# msg = MIMEMultipart('alternative')
-# msg['From'] = _format_addr('Python爱好者 <%s>' % from_addr)
-# msg['To'] = _format_addr('管理员 <%s>' % to_addr)
-# msg['Subject'] = Header('来自SMTP的问候……', 'utf-8').encode()
-# msg.attach(MIMEText('hello', 'plain', 'utf-8'))
-# msg.attach(MIMEText('<html><body><h1>Hello</h1></body></html>',
-#                     'html', 'utf-8'))
-#
-# # 加密SMTP
-# # 只需要在创建SMTP对象后，立刻调用starttls()方法，就创建了安全连接。
-# # 后面的代码和前面的发送邮件代码完全一样。
-# # smtp_server = 'smtp.gmail.com'
-# # smtp_port = 587
-# # server = smtplib.SMTP(smtp_server, smtp_port)
-# # server.starttls()
-# # # 剩下的代码和前面的一模一样:
-# # server.set_debuglevel(1)
-# # ...
-#
-#
-# server = smtplib.SMTP_SSL(smtp_server, 465)
-# server.set_debuglevel(1)
-# server.login(from_addr, password)
-# server.sendmail(from_addr, [to_addr], msg.as_string())
-# server.quit()
-
-# POP3收取邮件: SMTP用于发送邮件，POP3用于收取邮件
-# 收取邮件就是编写一个MUA作为客户端，从MDA把邮件获取到用户的电脑或者手机上。
-# 收取邮件最常用的协议是POP协议，目前版本号是3，俗称POP3。
-# Python内置一个poplib模块，实现了POP3协议，可以直接用来收邮件
-
-# 收取邮件分两步：
-# 第一步：用poplib把邮件的原始文本下载到本地；
-# 第二部：用email解析原始文本，还原为邮件对象。
-
-# 通过POP3下载邮件
-import poplib
-
-# 输入邮件地址, 口令和POP3服务器地址:
-email = input('Email: ')
-password = input('Password: ')
-pop3_server = input('POP3 server: ')
-
-# 连接到POP3服务器:
-server = poplib.POP3(pop3_server)
-# 可以打开或关闭调试信息:
-server.set_debuglevel(1)
-# 可选:打印POP3服务器的欢迎文字:
-print(server.getwelcome().decode('utf-8'))
-
-# 身份认证:
-server.user(email)
-server.pass_(password)
-
-# stat()返回邮件数量和占用空间:
-print('Messages: %s. Size: %s' % server.stat())
-# list()返回所有邮件的编号:
-resp, mails, octets = server.list()
-# 可以查看返回的列表类似[b'1 82923', b'2 2184', ...]
-print(mails)
-
-# 获取最新一封邮件, 注意索引号从1开始:
-index = len(mails)
-resp, lines, octets = server.retr(index)
-
-# lines存储了邮件的原始文本的每一行,
-# 可以获得整个邮件的原始文本:
-msg_content = b'\r\n'.join(lines).decode('utf-8')
-# 稍后解析出邮件:
-msg = Parser().parsestr(msg_content)
-
-# 可以根据邮件索引号直接从服务器删除邮件:
-# server.dele(index)
-# 关闭连接:
-server.quit()
-
-# 用POP3获取邮件其实很简单，要获取所有邮件，只需要循环使用retr()把每一封邮件内容拿到即可。
-# 真正麻烦的是把邮件的原始内容解析为可以阅读的邮件对象。
-
-# 解析邮件
-from email.parser import Parser
-from email.header import decode_header
-from email.utils import parseaddr
-
-import poplib
-
-# 解析为Message对象
-msg = Parser().parsestr(msg_content)
-
-
-# 但是这个Message对象本身可能是一个MIMEMultipart对象，
-# 即包含嵌套的其他MIMEBase对象，嵌套可能还不止一层。
-
-
-# indent用于缩进显示:
-def print_info(msg, indent=0):
-    if indent == 0:
-        for header in ['From', 'To', 'Subject']:
-            value = msg.get(header, '')
-            if value:
-                if header=='Subject':
-                    value = decode_str(value)
-                else:
-                    hdr, addr = parseaddr(value)
-                    name = decode_str(hdr)
-                    value = u'%s <%s>' % (name, addr)
-            print('%s%s: %s' % ('  ' * indent, header, value))
-    if (msg.is_multipart()):
-        parts = msg.get_payload()
-        for n, part in enumerate(parts):
-            print('%spart %s' % ('  ' * indent, n))
-            print('%s--------------------' % ('  ' * indent))
-            print_info(part, indent + 1)
-    else:
-        content_type = msg.get_content_type()
-        if content_type=='text/plain' or content_type=='text/html':
-            content = msg.get_payload(decode=True)
-            charset = guess_charset(msg)
-            if charset:
-                content = content.decode(charset)
-            print('%sText: %s' % ('  ' * indent, content + '...'))
-        else:
-            print('%sAttachment: %s' % ('  ' * indent, content_type))
-
-
-# 邮件的Subject或者Email中包含的名字都是经过编码后的str，要正常显示，就必须decode：
-# decode_header()返回一个list，因为像Cc、Bcc这样的字段可能包含多个邮件地址，
-# 所以解析出来的会有多个元素。上面的代码我们偷了个懒，只取了第一个元素。
+# 邮件的Subject或者Email中包含的名字都是经过编码后的str,要正常显示
+# 就必须decode
 def decode_str(s):
+    # 在不转换字符集的情况下解码消息头值,返回一个list
     value, charset = decode_header(s)[0]
     if charset:
         value = value.decode(charset)
     return value
 
 
-# 文本邮件的内容也是str，还需要检测编码，否则，非UTF-8编码的邮件都无法正常显示
+# 文本邮件的内容也是str,还需要检测编码，
+# 否则，非UTF-8编码的邮件都无法正常显示：
+
 def guess_charset(msg):
+    print('msg::%s' % msg)
+    # 得到字符集
     charset = msg.get_charset()
+    print('charset::%s' % charset)
     if charset is None:
+        # lower:所有大写字符为小写
         content_type = msg.get('Content-Type', '').lower()
+        print('content_type::%s' % content_type)
+        # find:检测字符串中是否包含子字符串
+        # 返回charset=头字符的位置
         pos = content_type.find('charset=')
+        print('pos::', pos)
         if pos >= 0:
+            # strip:移除字符串头尾指定的字符(默认为空格)
             charset = content_type[pos + 8:].strip()
+    print('charset::%s' % charset)
     return charset
+
+
+# indent用于缩进显示：
+def print_info(msg, indent=0):
+    # 初始分析
+    if indent == 0:
+        # 遍历获取 发件人，收件人，主题
+        for header in ['From', 'To', 'Subject']:
+            # 获得对应的内容
+            value = msg.get(header, '')
+            # 有内容
+            if value:
+                # 如果是主题
+                if header == 'Subject':
+                    # 解码主题
+                    value = decode_str(value)
+                else:
+                    # parseaddr：解析字符串中的email地址
+                    hdr, addr = parseaddr(value)
+                    # 解码主题
+                    name = decode_str(hdr)
+                    # 合成内容
+                    value = u'%s <%s>' % (name, addr)
+            print('%s%s：%s' % (' ' * indent, header, value))
+    # 如果消息由多个部分组成，则返回True。
+    if msg.is_multipart():
+        # 返回list,包含所有的子对象
+        parts = msg.get_payload()
+        # enumerate将其组成一个索引序列，利用它可以同时获得索引和值
+        for n, part in enumerate(parts):
+            # 打印消息模块编号
+            print('%s part %s' % (' ' * indent, n))
+            # 打印分割符号
+            print('%s--------------------' % (' ' * indent))
+            # 递归打印
+            print_info(part, indent + 1)
+    else:
+        # 递归结束条件，打印最基本模块
+        # 返回消息的内容类型。
+        content_type = msg.get_content_type()
+        # 如果是text类型或者是html类型
+        if content_type == 'text/plain' or content_type == 'text/html':
+            # 返回list,包含所有的子对象，开启解码
+            content = msg.get_payload(decode=True)
+            # 猜测字符集
+            charset = guess_charset(msg)
+            # 字符集不为空
+            if charset:
+                # 解密
+                content = content.decode(charset)
+            # 打印内容
+            print('%s Text: %s' % (' ' * indent, content + '...'))
+        else:
+            print('%s Attachment: %s' % (' ' * indent, content_type))
+
+
+# # 输入邮件地址，口令和POP3服务器地址
+email = input('Email：')
+password = input('Password：')
+pop3_server = input('POP 3 server：')
+
+# 连接到POP3服务器
+server = poplib.POP3_SSL(pop3_server)
+# 可以打开或者关闭调试信息：
+server.set_debuglevel(1)
+# 可选：打印POP3服务器的欢迎文字
+print(server.getwelcome().decode('utf-8'))
+
+# 身份认证：
+server.user(email)
+server.pass_(password)
+
+# stat()返回邮件数量和占用空间：
+print('Message:%s.Size:%s' % server.stat())
+# list()返回所有邮件的编号：
+resp, mails, octets = server.list()
+# 可以查看返回的列表类似[b'1 82923', b'2 2184', ...]
+print(mails)
+
+# 获取最新一封邮件，注意索引号从1开始：
+index = len(mails)
+resp, lines, octets = server.retr(index)
+
+# lines存储了邮件的原始文本的每一行，
+# 可以获得整个邮件的原始文本：
+msg_content = b'\r\n'.join(lines).decode('utf-8')
+# 稍后解析出邮件：
+msg = Parser().parsestr(msg_content)
+
+print_info(msg)
+# 可以根据邮件索引号直接从服务器删除邮件：
+# server.dele(index)
+# 关闭连接：
+server.quit()
 
 
 # Email: 2766152135@qq.com
